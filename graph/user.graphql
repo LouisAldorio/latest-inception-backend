@@ -1,0 +1,44 @@
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    role: String!
+    whatsapp: String!
+    avatar: String @goField(forceResolver: true)
+    friends: [User!] @goField(forceResolver: true)
+    looking_for: [String!] @goField(forceResolver: true)
+    comodity: [Comodity!] @goField(forceResolver:true)
+}
+
+input NewUser {
+    username: String!
+    email: String!  
+    role: String!
+    whatsapp_number: String
+    password: String!   
+    confirm_password: String!
+}
+
+input LoginRequest {
+    username: String!
+    password: String! 
+}
+
+type LoginResponse {
+    access_token: String!
+    user: User!
+}
+
+input EditUser {
+    email: String!
+    whatsapp_number: String!
+    profile_image: String!
+    looking_for: [String!]!
+}
+
+type UserOps {
+    register(input: NewUser!): LoginResponse @goField(forceResolver:true)
+    login(input: LoginRequest!): LoginResponse! @goField(forceResolver:true)
+    update(input: EditUser!): User! @goField(forceResolver:true)
+    deleteUser(username: String!): Boolean @hasRole(role: "SUPPLIER") @goField(forceResolver:true)
+}

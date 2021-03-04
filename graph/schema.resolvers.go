@@ -10,11 +10,39 @@ import (
 	"myapp/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) User(ctx context.Context) (*model.UserOps, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *mutationResolver) Commodity(ctx context.Context) (*model.CommodityOps, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) Schedule(ctx context.Context) (*model.ScheduleOps, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) Friends(ctx context.Context) (*model.FriendOps, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Comodities(ctx context.Context, limit *int, page *int) (*model.ComodityPagination, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) UsersByRole(ctx context.Context, role string) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) ScheduleByUser(ctx context.Context) ([]*model.Schedule, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) FriendList(ctx context.Context) ([]*model.Friend, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

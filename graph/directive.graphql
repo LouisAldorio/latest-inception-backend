@@ -1,0 +1,3 @@
+directive @goField(forceResolver: Boolean) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+directive @hasRole(role: String!) on FIELD_DEFINITION
