@@ -1,3 +1,5 @@
+scalar Time
+
 type Mutation {
     user: UserOps! @goField(forceResolver:true)
     commodity: CommodityOps! @goField(forceResolver:true)

@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -130,11 +131,14 @@ type ComplexityRoot struct {
 	User struct {
 		Avatar     func(childComplexity int) int
 		Comodity   func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
 		Email      func(childComplexity int) int
 		Friends    func(childComplexity int) int
 		ID         func(childComplexity int) int
 		LookingFor func(childComplexity int) int
+		Password   func(childComplexity int) int
 		Role       func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
 		Username   func(childComplexity int) int
 		Whatsapp   func(childComplexity int) int
 	}
@@ -573,6 +577,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Comodity(childComplexity), true
 
+	case "User.created_at":
+		if e.complexity.User.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.User.CreatedAt(childComplexity), true
+
 	case "User.email":
 		if e.complexity.User.Email == nil {
 			break
@@ -601,12 +612,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.LookingFor(childComplexity), true
 
+	case "User.password":
+		if e.complexity.User.Password == nil {
+			break
+		}
+
+		return e.complexity.User.Password(childComplexity), true
+
 	case "User.role":
 		if e.complexity.User.Role == nil {
 			break
 		}
 
 		return e.complexity.User.Role(childComplexity), true
+
+	case "User.updated_at":
+		if e.complexity.User.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.User.UpdatedAt(childComplexity), true
 
 	case "User.username":
 		if e.complexity.User.Username == nil {
@@ -820,7 +845,9 @@ type ScheduleOps {
     update(input: EditSchedule!): Schedule! @goField(forceResolver: true)
     delete(id: String!): Boolean! @goField(forceResolver: true)
 }`, BuiltIn: false},
-	{Name: "graph/schema.graphql", Input: `type Mutation {
+	{Name: "graph/schema.graphql", Input: `scalar Time
+
+type Mutation {
     user: UserOps! @goField(forceResolver:true)
     commodity: CommodityOps! @goField(forceResolver:true)
     schedule: ScheduleOps! @goField(forceResolver: true)
@@ -841,6 +868,9 @@ type Query {
     email: String!
     role: String!
     whatsapp: String!
+    password: String!
+    created_at: Time!
+    updated_at: Time!
     avatar: String @goField(forceResolver: true)
     friends: [User!] @goField(forceResolver: true)
     looking_for: [String!] @goField(forceResolver: true)
@@ -851,7 +881,7 @@ input NewUser {
     username: String!
     email: String!  
     role: String!
-    whatsapp_number: String
+    whatsapp: String!
     password: String!   
     confirm_password: String!
 }
@@ -868,13 +898,13 @@ type LoginResponse {
 
 input EditUser {
     email: String!
-    whatsapp_number: String!
-    profile_image: String!
+    whatsapp: String!
+    avatar: String!
     looking_for: [String!]!
 }
 
 type UserOps {
-    register(input: NewUser!): LoginResponse @goField(forceResolver:true)
+    register(input: NewUser!): LoginResponse! @goField(forceResolver:true)
     login(input: LoginRequest!): LoginResponse! @goField(forceResolver:true)
     update(input: EditUser!): User! @goField(forceResolver:true)
     deleteUser(username: String!): Boolean @hasRole(role: "SUPPLIER") @goField(forceResolver:true)
@@ -2963,6 +2993,111 @@ func (ec *executionContext) _User_whatsapp(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Password, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_created_at(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_updated_at(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3123,11 +3258,14 @@ func (ec *executionContext) _UserOps_register(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.LoginResponse)
 	fc.Result = res
-	return ec.marshalOLoginResponse2ᚖmyappᚋgraphᚋmodelᚐLoginResponse(ctx, field.Selections, res)
+	return ec.marshalNLoginResponse2ᚖmyappᚋgraphᚋmodelᚐLoginResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserOps_login(ctx context.Context, field graphql.CollectedField, obj *model.UserOps) (ret graphql.Marshaler) {
@@ -4462,19 +4600,19 @@ func (ec *executionContext) unmarshalInputEditUser(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "whatsapp_number":
+		case "whatsapp":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whatsapp_number"))
-			it.WhatsappNumber, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whatsapp"))
+			it.Whatsapp, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "profile_image":
+		case "avatar":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profile_image"))
-			it.ProfileImage, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			it.Avatar, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4694,11 +4832,11 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "whatsapp_number":
+		case "whatsapp":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whatsapp_number"))
-			it.WhatsappNumber, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whatsapp"))
+			it.Whatsapp, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5350,6 +5488,21 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "password":
+			out.Values[i] = ec._User_password(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "created_at":
+			out.Values[i] = ec._User_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "updated_at":
+			out.Values[i] = ec._User_updated_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "avatar":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5425,6 +5578,9 @@ func (ec *executionContext) _UserOps(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._UserOps_register(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "login":
@@ -6076,6 +6232,21 @@ func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel
 	return ret
 }
 
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNUser2myappᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -6491,13 +6662,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return graphql.MarshalInt(*v)
-}
-
-func (ec *executionContext) marshalOLoginResponse2ᚖmyappᚋgraphᚋmodelᚐLoginResponse(ctx context.Context, sel ast.SelectionSet, v *model.LoginResponse) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._LoginResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalONewComodity2ᚖmyappᚋgraphᚋmodelᚐNewComodity(ctx context.Context, v interface{}) (*model.NewComodity, error) {

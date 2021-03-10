@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS comodity (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     unit_price DECIMAL(15, 2) NOT NULL,
     unit_type VARCHAR(15) NOT NULL,

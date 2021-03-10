@@ -4,6 +4,9 @@ type User {
     email: String!
     role: String!
     whatsapp: String!
+    password: String!
+    created_at: Time!
+    updated_at: Time!
     avatar: String @goField(forceResolver: true)
     friends: [User!] @goField(forceResolver: true)
     looking_for: [String!] @goField(forceResolver: true)
@@ -14,7 +17,7 @@ input NewUser {
     username: String!
     email: String!  
     role: String!
-    whatsapp_number: String
+    whatsapp: String!
     password: String!   
     confirm_password: String!
 }
@@ -31,13 +34,13 @@ type LoginResponse {
 
 input EditUser {
     email: String!
-    whatsapp_number: String!
-    profile_image: String!
+    whatsapp: String!
+    avatar: String!
     looking_for: [String!]!
 }
 
 type UserOps {
-    register(input: NewUser!): LoginResponse @goField(forceResolver:true)
+    register(input: NewUser!): LoginResponse! @goField(forceResolver:true)
     login(input: LoginRequest!): LoginResponse! @goField(forceResolver:true)
     update(input: EditUser!): User! @goField(forceResolver:true)
     deleteUser(username: String!): Boolean @hasRole(role: "SUPPLIER") @goField(forceResolver:true)

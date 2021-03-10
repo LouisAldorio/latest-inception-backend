@@ -23,7 +23,7 @@ func (u *UserClaim) HasRole(role string) bool {
 
 var jwtKey = []byte("secret")
 
-func CreateToken(user model.User) (string, error) {
+func CreateToken(user *model.User) (string, error) {
 	var signingMethod = jwt.SigningMethodHS256
 	var expiredTime = time.Now().AddDate(0, 1, 0).UnixNano() / int64(time.Millisecond)
 

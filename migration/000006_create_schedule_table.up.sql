@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS schedule (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     dealed_unit INT NOT NULL,
     start_date DATE NOT NULL,

@@ -11,7 +11,7 @@ import (
 )
 
 func (r *mutationResolver) User(ctx context.Context) (*model.UserOps, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &model.UserOps{}, nil
 }
 
 func (r *mutationResolver) Commodity(ctx context.Context) (*model.CommodityOps, error) {

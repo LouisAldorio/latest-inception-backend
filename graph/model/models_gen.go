@@ -39,10 +39,10 @@ type EditSchedule struct {
 }
 
 type EditUser struct {
-	Email          string   `json:"email"`
-	WhatsappNumber string   `json:"whatsapp_number"`
-	ProfileImage   string   `json:"profile_image"`
-	LookingFor     []string `json:"looking_for"`
+	Email      string   `json:"email"`
+	Whatsapp   string   `json:"whatsapp"`
+	Avatar     string   `json:"avatar"`
+	LookingFor []string `json:"looking_for"`
 }
 
 type Friend struct {
@@ -86,12 +86,12 @@ type NewSchedule struct {
 }
 
 type NewUser struct {
-	Username        string  `json:"username"`
-	Email           string  `json:"email"`
-	Role            string  `json:"role"`
-	WhatsappNumber  *string `json:"whatsapp_number"`
-	Password        string  `json:"password"`
-	ConfirmPassword string  `json:"confirm_password"`
+	Username        string `json:"username"`
+	Email           string `json:"email"`
+	Role            string `json:"role"`
+	Whatsapp        string `json:"whatsapp"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirm_password"`
 }
 
 type Schedule struct {
@@ -112,18 +112,6 @@ type ScheduleOps struct {
 	Create *Schedule `json:"create"`
 	Update *Schedule `json:"update"`
 	Delete bool      `json:"delete"`
-}
-
-type User struct {
-	ID         int         `json:"id"`
-	Username   string      `json:"username"`
-	Email      string      `json:"email"`
-	Role       string      `json:"role"`
-	Whatsapp   string      `json:"whatsapp"`
-	Avatar     *string     `json:"avatar"`
-	Friends    []*User     `json:"friends"`
-	LookingFor []string    `json:"looking_for"`
-	Comodity   []*Comodity `json:"comodity"`
 }
 
 type UserOps struct {

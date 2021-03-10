@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"myapp/graph/generated"
 	"myapp/graph/model"
+	"myapp/service"
+	"time"
 )
 
 func (r *userResolver) Avatar(ctx context.Context, obj *model.User) (*string, error) {
@@ -27,11 +29,11 @@ func (r *userResolver) Comodity(ctx context.Context, obj *model.User) ([]*model.
 }
 
 func (r *userOpsResolver) Register(ctx context.Context, obj *model.UserOps, input model.NewUser) (*model.LoginResponse, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.Register(ctx, input)
 }
 
 func (r *userOpsResolver) Login(ctx context.Context, obj *model.UserOps, input model.LoginRequest) (*model.LoginResponse, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.Login(ctx, input)
 }
 
 func (r *userOpsResolver) Update(ctx context.Context, obj *model.UserOps, input model.EditUser) (*model.User, error) {
@@ -57,6 +59,15 @@ type userOpsResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (*time.Time, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (*time.Time, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+func (r *userResolver) Password(ctx context.Context, obj *model.User) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 func (r *userResolver) Products(ctx context.Context, obj *model.User) ([]*model.Comodity, error) {
 	panic(fmt.Errorf("not implemented"))
 }
