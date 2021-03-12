@@ -8,6 +8,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
+	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/lib/pq v1.8.0
 	github.com/rs/cors v1.7.0
 	github.com/vektah/gqlparser v1.3.1
