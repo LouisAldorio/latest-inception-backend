@@ -32,7 +32,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		//validate claim
 		claims, ok := jwtToken.Claims.(*tool.UserClaim)
-		fmt.Println(claims)
 		if !ok && !jwtToken.Valid {
 			http.Error(w, "Invalid token", http.StatusForbidden)
 			return

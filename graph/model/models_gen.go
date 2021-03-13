@@ -2,21 +2,14 @@
 
 package model
 
+type Category struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type CommodityOps struct {
 	Create *Comodity `json:"create"`
 	Update *Comodity `json:"update"`
-}
-
-type Comodity struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Image       []*string `json:"image"`
-	UnitPrice   string    `json:"unit_price"`
-	UnitType    string    `json:"unit_type"`
-	MinPurchase string    `json:"min_purchase"`
-	Description *string   `json:"description"`
-	Username    string    `json:"username"`
-	User        *User     `json:"user"`
 }
 
 type ComodityPagination struct {
@@ -24,6 +17,15 @@ type ComodityPagination struct {
 	Page      *int        `json:"page"`
 	TotalItem int         `json:"total_item"`
 	Nodes     []*Comodity `json:"nodes"`
+}
+
+type ComodityWithCategory struct {
+	Limit      *int        `json:"limit"`
+	Page       *int        `json:"page"`
+	CategoryID int         `json:"category_id"`
+	Category   *Category   `json:"category"`
+	TotalItem  int         `json:"total_item"`
+	Nodes      []*Comodity `json:"nodes"`
 }
 
 type EditSchedule struct {
@@ -66,10 +68,10 @@ type LoginResponse struct {
 
 type NewComodity struct {
 	Name        string    `json:"name"`
-	MinPurchase string    `json:"min_purchase"`
+	UnitPrice   float64   `json:"unit_price"`
 	UnitType    string    `json:"unit_type"`
-	UnitPrice   string    `json:"unit_price"`
-	Description string    `json:"description"`
+	MinPurchase int       `json:"min_purchase"`
+	Description *string   `json:"description"`
 	Images      []*string `json:"images"`
 }
 

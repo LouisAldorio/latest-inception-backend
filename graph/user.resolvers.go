@@ -13,7 +13,8 @@ import (
 )
 
 func (r *userResolver) Avatar(ctx context.Context, obj *model.User) (*string, error) {
-	panic(fmt.Errorf("not implemented"))
+	var temp = "https://via.placeholder.com/500"
+	return &temp, nil
 }
 
 func (r *userResolver) Friends(ctx context.Context, obj *model.User) ([]*model.User, error) {
@@ -25,7 +26,7 @@ func (r *userResolver) LookingFor(ctx context.Context, obj *model.User) ([]strin
 }
 
 func (r *userResolver) Comodity(ctx context.Context, obj *model.User) ([]*model.Comodity, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.ComodityGetByUserID(ctx, obj.ID)
 }
 
 func (r *userOpsResolver) Register(ctx context.Context, obj *model.UserOps, input model.NewUser) (*model.LoginResponse, error) {

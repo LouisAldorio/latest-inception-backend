@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"myapp/graph/generated"
 	"myapp/graph/model"
+	"myapp/service"
 )
 
 func (r *mutationResolver) User(ctx context.Context) (*model.UserOps, error) {
@@ -15,7 +16,7 @@ func (r *mutationResolver) User(ctx context.Context) (*model.UserOps, error) {
 }
 
 func (r *mutationResolver) Commodity(ctx context.Context) (*model.CommodityOps, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &model.CommodityOps{}, nil
 }
 
 func (r *mutationResolver) Schedule(ctx context.Context) (*model.ScheduleOps, error) {
@@ -27,15 +28,22 @@ func (r *mutationResolver) Friends(ctx context.Context) (*model.FriendOps, error
 }
 
 func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.UserGetByUsername(ctx, username)
 }
 
 func (r *queryResolver) Comodities(ctx context.Context, limit *int, page *int) (*model.ComodityPagination, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &model.ComodityPagination{
+		Limit: limit,
+		Page:  page,
+	}, nil
+}
+
+func (r *queryResolver) ComoditiesByCategory(ctx context.Context, limit *int, page *int) ([]*model.ComodityWithCategory, error) {
+	return service.ComodityWithCategoryGet(ctx, limit, page)
 }
 
 func (r *queryResolver) UsersByRole(ctx context.Context, role string) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.UserGetByRole(ctx, role)
 }
 
 func (r *queryResolver) ScheduleByUser(ctx context.Context) ([]*model.Schedule, error) {

@@ -11,8 +11,8 @@ import (
 )
 
 type UserClaim struct {
-	Username string
-	Role     string
+	ID   int
+	Role string
 	jwt.StandardClaims
 }
 
@@ -28,8 +28,8 @@ func CreateToken(user *model.User) (string, error) {
 	var expiredTime = time.Now().AddDate(0, 1, 0).UnixNano() / int64(time.Millisecond)
 
 	customClaim := UserClaim{
-		Username: user.Username,
-		Role:     user.Role,
+		ID:   user.ID,
+		Role: user.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expiredTime,
 		},

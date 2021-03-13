@@ -33,7 +33,29 @@ func UserCreate(ctx context.Context, input model.NewUser) (*model.User, error) {
 	db, sql := config.ConnectDB()
 	defer sql.Close()
 
-	err := db.Table("user").Save(&user).Error
+	err := db.Table("user").Create(&user).Error
 
 	return &user, err
+}
+
+func UserGetByID(ctx context.Context, id int) (*model.User, error) {
+	var user model.User
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	err := db.Table("user").Where("id = ?", id).First(&user).Error
+
+	return &user, err
+}
+
+func UserGetByRole(ctx context.Context, role string) ([]*model.User, error) {
+	var users []*model.User
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	err := db.Table("user").Where("role = ?", role).Find(&users).Error
+
+	return users, err
 }

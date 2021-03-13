@@ -10,6 +10,7 @@ type Mutation {
 type Query {
     user_by_username(username: String!): User!
     comodities(limit: Int, page: Int): ComodityPagination!
+    comoditiesByCategory(limit: Int, page: Int): [ComodityWithCategory!]!
     users_by_role(role: String!): [User!]!
     schedule_by_user: [Schedule]! @goField(forceResolver: true)
     friend_list: [Friend]! @goField(forceResolver: true)

@@ -1,21 +1,34 @@
 type Comodity {
-    id: String!
+    id: ID!
     name: String!
-    image: [String]!
-    unit_price: String!
+    image: [String]! @goField(forceResolver: true)
+    unit_price: Float!
     unit_type: String!
-    min_purchase: String!    
+    min_purchase: Int!    
     description: String
-    username: String!
+    user_id: ID!
+    category_id: ID!
+    created_at: Time!
+    updated_at: Time!
+    deleted_at: Time
     user: User! @goField(forceResolver: true)
+}
+
+type ComodityWithCategory {
+    limit: Int
+    page: Int    
+    category_id: ID!
+    category: Category! 
+    total_item: Int! @goField(forceResolver: true)
+    nodes: [Comodity!]! @goField(forceResolver: true)
 }
 
 input NewComodity {
     name: String!
-    min_purchase: String!
+    unit_price: Float!
     unit_type: String!
-    unit_price: String!
-    description: String!
+    min_purchase: Int!
+    description: String
     images: [String]!
 }
 
@@ -27,6 +40,6 @@ type ComodityPagination {
 }
 
 type CommodityOps {
-    create(input: NewComodity): Comodity! @goField(forceResolver:true)
-    update(input: NewComodity): Comodity! @goField(forceResolver:true)
+    create(input: NewComodity!): Comodity! @goField(forceResolver:true)
+    update(input: NewComodity!): Comodity! @goField(forceResolver:true)
 }

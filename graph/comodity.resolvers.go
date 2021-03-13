@@ -8,26 +8,40 @@ import (
 	"fmt"
 	"myapp/graph/generated"
 	"myapp/graph/model"
+	"myapp/service"
 )
 
-func (r *commodityOpsResolver) Create(ctx context.Context, obj *model.CommodityOps, input *model.NewComodity) (*model.Comodity, error) {
+func (r *commodityOpsResolver) Create(ctx context.Context, obj *model.CommodityOps, input model.NewComodity) (*model.Comodity, error) {
+	return service.ComodityCreate(ctx, input)
+}
+
+func (r *commodityOpsResolver) Update(ctx context.Context, obj *model.CommodityOps, input model.NewComodity) (*model.Comodity, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *commodityOpsResolver) Update(ctx context.Context, obj *model.CommodityOps, input *model.NewComodity) (*model.Comodity, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *comodityResolver) Image(ctx context.Context, obj *model.Comodity) ([]*string, error) {
+	var temp = "https://via.placeholder.com/500"
+	return []*string{&temp, &temp}, nil
 }
 
 func (r *comodityResolver) User(ctx context.Context, obj *model.Comodity) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.UserGetByID(ctx, obj.UserID)
 }
 
 func (r *comodityPaginationResolver) TotalItem(ctx context.Context, obj *model.ComodityPagination) (int, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.ComodityGetCount(ctx, obj.Limit, obj.Page)
 }
 
 func (r *comodityPaginationResolver) Nodes(ctx context.Context, obj *model.ComodityPagination) ([]*model.Comodity, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.ComodityGetList(ctx, obj.Limit, obj.Page)
+}
+
+func (r *comodityWithCategoryResolver) TotalItem(ctx context.Context, obj *model.ComodityWithCategory) (int, error) {
+	return service.ComodityGetCountByCategoryID(ctx, obj.CategoryID, obj.Limit, obj.Page)
+}
+
+func (r *comodityWithCategoryResolver) Nodes(ctx context.Context, obj *model.ComodityWithCategory) ([]*model.Comodity, error) {
+	return service.ComodityGetByCategoryID(ctx, obj.CategoryID, obj.Limit, obj.Page)
 }
 
 // CommodityOps returns generated.CommodityOpsResolver implementation.
@@ -41,6 +55,22 @@ func (r *Resolver) ComodityPagination() generated.ComodityPaginationResolver {
 	return &comodityPaginationResolver{r}
 }
 
+// ComodityWithCategory returns generated.ComodityWithCategoryResolver implementation.
+func (r *Resolver) ComodityWithCategory() generated.ComodityWithCategoryResolver {
+	return &comodityWithCategoryResolver{r}
+}
+
 type commodityOpsResolver struct{ *Resolver }
 type comodityResolver struct{ *Resolver }
 type comodityPaginationResolver struct{ *Resolver }
+type comodityWithCategoryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *comodityResolver) CategoryID(ctx context.Context, obj *model.Comodity) (int, error) {
+	panic(fmt.Errorf("not implemented"))
+}
