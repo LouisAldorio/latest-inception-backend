@@ -9,11 +9,10 @@ import (
 	"myapp/graph/generated"
 	"myapp/graph/model"
 	"myapp/service"
-	"time"
 )
 
 func (r *userResolver) Avatar(ctx context.Context, obj *model.User) (*string, error) {
-	var temp = "https://via.placeholder.com/500"
+	var temp = "https://images.unsplash.com/photo-1615943168243-5b2503679e47?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
 	return &temp, nil
 }
 
@@ -53,22 +52,3 @@ func (r *Resolver) UserOps() generated.UserOpsResolver { return &userOpsResolver
 
 type userResolver struct{ *Resolver }
 type userOpsResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *userResolver) CreatedAt(ctx context.Context, obj *model.User) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) UpdatedAt(ctx context.Context, obj *model.User) (*time.Time, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Password(ctx context.Context, obj *model.User) (string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *userResolver) Products(ctx context.Context, obj *model.User) ([]*model.Comodity, error) {
-	panic(fmt.Errorf("not implemented"))
-}

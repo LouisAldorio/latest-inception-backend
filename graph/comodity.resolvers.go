@@ -20,8 +20,14 @@ func (r *commodityOpsResolver) Update(ctx context.Context, obj *model.CommodityO
 }
 
 func (r *comodityResolver) Image(ctx context.Context, obj *model.Comodity) ([]*string, error) {
-	var temp = "https://via.placeholder.com/500"
-	return []*string{&temp, &temp}, nil
+	var img1 = "https://images.unsplash.com/photo-1615932114921-0ffc1852c5d5?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+	var img2 = "https://images.unsplash.com/photo-1615910388452-fdad95ebb038?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1000&q=80"
+	var img3 = "https://images.unsplash.com/photo-1615886490002-ae8172eea2de?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+	var img4 = "https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
+	var img5 = "https://images.unsplash.com/photo-1615879965520-cde89ea80726?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1000&q=80"
+	var img6 = "https://images.unsplash.com/photo-1615839031296-a23180ec04ba?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1000&q=80"
+	var temp = []*string{&img1, &img2, &img3, &img4, &img5, &img6}
+	return temp, nil
 }
 
 func (r *comodityResolver) User(ctx context.Context, obj *model.Comodity) (*model.User, error) {

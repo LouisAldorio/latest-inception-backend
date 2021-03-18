@@ -72,6 +72,7 @@ type NewComodity struct {
 	UnitType    string    `json:"unit_type"`
 	MinPurchase int       `json:"min_purchase"`
 	Description *string   `json:"description"`
+	CategoryID  int       `json:"category_id"`
 	Images      []*string `json:"images"`
 }
 

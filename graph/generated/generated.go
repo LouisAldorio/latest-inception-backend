@@ -917,6 +917,7 @@ input NewComodity {
     unit_type: String!
     min_purchase: Int!
     description: String
+    category_id: ID!
     images: [String]!
 }
 
@@ -5319,6 +5320,14 @@ func (ec *executionContext) unmarshalInputNewComodity(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "category_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category_id"))
+			it.CategoryID, err = ec.unmarshalNID2int(ctx, v)
 			if err != nil {
 				return it, err
 			}

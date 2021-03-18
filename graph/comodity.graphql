@@ -29,6 +29,7 @@ input NewComodity {
     unit_type: String!
     min_purchase: Int!
     description: String
+    category_id: ID!
     images: [String]!
 }
 

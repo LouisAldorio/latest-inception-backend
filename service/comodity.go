@@ -58,6 +58,7 @@ func ComodityCreate(ctx context.Context, input model.NewComodity) (*model.Comodi
 		UnitType:    input.UnitType,
 		MinPurchase: input.MinPurchase,
 		Description: input.Description,
+		CategoryID:  input.CategoryID,
 		UserID:      user.ID,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
