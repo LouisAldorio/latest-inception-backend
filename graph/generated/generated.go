@@ -107,9 +107,20 @@ type ComplexityRoot struct {
 		Add func(childComplexity int, friends []*string) int
 	}
 
+	Image struct {
+		ID   func(childComplexity int) int
+		Link func(childComplexity int) int
+		Path func(childComplexity int) int
+	}
+
 	LoginResponse struct {
 		AccessToken func(childComplexity int) int
 		User        func(childComplexity int) int
+	}
+
+	LookingFor struct {
+		Item   func(childComplexity int) int
+		UserID func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -119,13 +130,20 @@ type ComplexityRoot struct {
 		User      func(childComplexity int) int
 	}
 
+	NewImage struct {
+		Link func(childComplexity int) int
+		Path func(childComplexity int) int
+	}
+
 	Query struct {
-		Comodities           func(childComplexity int, limit *int, page *int) int
-		ComoditiesByCategory func(childComplexity int, limit *int, page *int) int
-		FriendList           func(childComplexity int) int
-		ScheduleByUser       func(childComplexity int) int
-		UserByUsername       func(childComplexity int, username string) int
-		UsersByRole          func(childComplexity int, role string) int
+		CategoryList             func(childComplexity int) int
+		Comodities               func(childComplexity int, limit *int, page *int) int
+		ComoditiesByCategory     func(childComplexity int, categoryID int) int
+		ComoditiesWithCategories func(childComplexity int, limit *int, page *int) int
+		FriendList               func(childComplexity int) int
+		ScheduleByUser           func(childComplexity int) int
+		UserByUsername           func(childComplexity int, username string) int
+		UsersByRole              func(childComplexity int, role string) int
 	}
 
 	Schedule struct {
@@ -155,6 +173,7 @@ type ComplexityRoot struct {
 		Email      func(childComplexity int) int
 		Friends    func(childComplexity int) int
 		ID         func(childComplexity int) int
+		Image      func(childComplexity int) int
 		LookingFor func(childComplexity int) int
 		Password   func(childComplexity int) int
 		Role       func(childComplexity int) int
@@ -203,10 +222,12 @@ type MutationResolver interface {
 type QueryResolver interface {
 	UserByUsername(ctx context.Context, username string) (*model.User, error)
 	Comodities(ctx context.Context, limit *int, page *int) (*model.ComodityPagination, error)
-	ComoditiesByCategory(ctx context.Context, limit *int, page *int) ([]*model.ComodityWithCategory, error)
+	ComoditiesWithCategories(ctx context.Context, limit *int, page *int) ([]*model.ComodityWithCategory, error)
+	ComoditiesByCategory(ctx context.Context, categoryID int) ([]*model.Comodity, error)
 	UsersByRole(ctx context.Context, role string) ([]*model.User, error)
 	ScheduleByUser(ctx context.Context) ([]*model.Schedule, error)
 	FriendList(ctx context.Context) ([]*model.Friend, error)
+	CategoryList(ctx context.Context) ([]*model.Category, error)
 }
 type ScheduleResolver interface {
 	InvolvedUsers(ctx context.Context, obj *model.Schedule) ([]*model.User, error)
@@ -217,7 +238,7 @@ type ScheduleOpsResolver interface {
 	Delete(ctx context.Context, obj *model.ScheduleOps, id string) (bool, error)
 }
 type UserResolver interface {
-	Avatar(ctx context.Context, obj *model.User) (*string, error)
+	Image(ctx context.Context, obj *model.User) (*model.Image, error)
 	Friends(ctx context.Context, obj *model.User) ([]*model.User, error)
 	LookingFor(ctx context.Context, obj *model.User) ([]string, error)
 	Comodity(ctx context.Context, obj *model.User) ([]*model.Comodity, error)
@@ -469,6 +490,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FriendOps.Add(childComplexity, args["friends"].([]*string)), true
 
+	case "Image.id":
+		if e.complexity.Image.ID == nil {
+			break
+		}
+
+		return e.complexity.Image.ID(childComplexity), true
+
+	case "Image.link":
+		if e.complexity.Image.Link == nil {
+			break
+		}
+
+		return e.complexity.Image.Link(childComplexity), true
+
+	case "Image.path":
+		if e.complexity.Image.Path == nil {
+			break
+		}
+
+		return e.complexity.Image.Path(childComplexity), true
+
 	case "LoginResponse.access_token":
 		if e.complexity.LoginResponse.AccessToken == nil {
 			break
@@ -482,6 +524,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LoginResponse.User(childComplexity), true
+
+	case "LookingFor.item":
+		if e.complexity.LookingFor.Item == nil {
+			break
+		}
+
+		return e.complexity.LookingFor.Item(childComplexity), true
+
+	case "LookingFor.user_id":
+		if e.complexity.LookingFor.UserID == nil {
+			break
+		}
+
+		return e.complexity.LookingFor.UserID(childComplexity), true
 
 	case "Mutation.commodity":
 		if e.complexity.Mutation.Commodity == nil {
@@ -511,6 +567,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.User(childComplexity), true
 
+	case "NewImage.link":
+		if e.complexity.NewImage.Link == nil {
+			break
+		}
+
+		return e.complexity.NewImage.Link(childComplexity), true
+
+	case "NewImage.path":
+		if e.complexity.NewImage.Path == nil {
+			break
+		}
+
+		return e.complexity.NewImage.Path(childComplexity), true
+
+	case "Query.category_list":
+		if e.complexity.Query.CategoryList == nil {
+			break
+		}
+
+		return e.complexity.Query.CategoryList(childComplexity), true
+
 	case "Query.comodities":
 		if e.complexity.Query.Comodities == nil {
 			break
@@ -523,17 +600,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Comodities(childComplexity, args["limit"].(*int), args["page"].(*int)), true
 
-	case "Query.comoditiesByCategory":
+	case "Query.comodities_by_category":
 		if e.complexity.Query.ComoditiesByCategory == nil {
 			break
 		}
 
-		args, err := ec.field_Query_comoditiesByCategory_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_comodities_by_category_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.ComoditiesByCategory(childComplexity, args["limit"].(*int), args["page"].(*int)), true
+		return e.complexity.Query.ComoditiesByCategory(childComplexity, args["categoryID"].(int)), true
+
+	case "Query.comodities_with_categories":
+		if e.complexity.Query.ComoditiesWithCategories == nil {
+			break
+		}
+
+		args, err := ec.field_Query_comodities_with_categories_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ComoditiesWithCategories(childComplexity, args["limit"].(*int), args["page"].(*int)), true
 
 	case "Query.friend_list":
 		if e.complexity.Query.FriendList == nil {
@@ -727,6 +816,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.ID(childComplexity), true
+
+	case "User.image":
+		if e.complexity.User.Image == nil {
+			break
+		}
+
+		return e.complexity.User.Image(childComplexity), true
 
 	case "User.looking_for":
 		if e.complexity.User.LookingFor == nil {
@@ -943,6 +1039,20 @@ directive @hasRole(role: String!) on FIELD_DEFINITION`, BuiltIn: false},
 type FriendOps {
     add(friends: [String]!): User! @goField(forceResolver: true)
 }`, BuiltIn: false},
+	{Name: "graph/image.graphql", Input: `type Image {
+    id: ID!
+    path: String!
+    link: String!
+}
+
+type NewImage {
+    path: String!
+    link: String!
+}`, BuiltIn: false},
+	{Name: "graph/lookingFor.graphql", Input: `type LookingFor {
+    user_id: ID!
+    item: String!
+}`, BuiltIn: false},
 	{Name: "graph/schedule.graphql", Input: `type Schedule{
     id: ID!
     schedule_name: String!
@@ -989,19 +1099,21 @@ type ScheduleOps {
 	{Name: "graph/schema.graphql", Input: `scalar Time
 
 type Mutation {
-    user: UserOps! @goField(forceResolver:true)
-    commodity: CommodityOps! @goField(forceResolver:true)
-    schedule: ScheduleOps! @goField(forceResolver: true)
-    friends: FriendOps! @goField(forceResolver: true)
+    user: UserOps! 
+    commodity: CommodityOps! 
+    schedule: ScheduleOps! 
+    friends: FriendOps!
 }
 
 type Query {
     user_by_username(username: String!): User!
     comodities(limit: Int, page: Int): ComodityPagination!
-    comoditiesByCategory(limit: Int, page: Int): [ComodityWithCategory!]!
+    comodities_with_categories(limit: Int, page: Int): [ComodityWithCategory!]!
+    comodities_by_category(categoryID: Int!): [Comodity!]!
     users_by_role(role: String!): [User!]!
-    schedule_by_user: [Schedule]! @goField(forceResolver: true)
-    friend_list: [Friend]! @goField(forceResolver: true)
+    schedule_by_user: [Schedule]! 
+    friend_list: [Friend]! 
+    category_list: [Category]!     
 }
 `, BuiltIn: false},
 	{Name: "graph/user.graphql", Input: `type User {
@@ -1013,7 +1125,8 @@ type Query {
     password: String!
     created_at: Time!
     updated_at: Time!
-    avatar: String @goField(forceResolver: true)
+    avatar: ID 
+    image: Image! @goField(forceResolver: true)
     friends: [User!] @goField(forceResolver: true)
     looking_for: [String!] @goField(forceResolver: true)
     comodity: [Comodity!] @goField(forceResolver:true)
@@ -1133,7 +1246,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_comoditiesByCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_comodities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -1157,7 +1270,22 @@ func (ec *executionContext) field_Query_comoditiesByCategory_args(ctx context.Co
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_comodities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_comodities_by_category_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["categoryID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryID"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["categoryID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_comodities_with_categories_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -2407,6 +2535,111 @@ func (ec *executionContext) _FriendOps_add(ctx context.Context, field graphql.Co
 	return ec.marshalNUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Image_id(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_path(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Path, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_link(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Link, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _LoginResponse_access_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginResponse) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2475,6 +2708,76 @@ func (ec *executionContext) _LoginResponse_user(ctx context.Context, field graph
 	res := resTmp.(*model.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _LookingFor_user_id(ctx context.Context, field graphql.CollectedField, obj *model.LookingFor) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "LookingFor",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _LookingFor_item(ctx context.Context, field graphql.CollectedField, obj *model.LookingFor) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "LookingFor",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Item, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2617,6 +2920,76 @@ func (ec *executionContext) _Mutation_friends(ctx context.Context, field graphql
 	return ec.marshalNFriendOps2ᚖmyappᚋgraphᚋmodelᚐFriendOps(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _NewImage_path(ctx context.Context, field graphql.CollectedField, obj *model.NewImage) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NewImage",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Path, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NewImage_link(ctx context.Context, field graphql.CollectedField, obj *model.NewImage) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NewImage",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Link, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_user_by_username(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2701,7 +3074,7 @@ func (ec *executionContext) _Query_comodities(ctx context.Context, field graphql
 	return ec.marshalNComodityPagination2ᚖmyappᚋgraphᚋmodelᚐComodityPagination(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_comoditiesByCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_comodities_with_categories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2718,7 +3091,7 @@ func (ec *executionContext) _Query_comoditiesByCategory(ctx context.Context, fie
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_comoditiesByCategory_args(ctx, rawArgs)
+	args, err := ec.field_Query_comodities_with_categories_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2726,7 +3099,7 @@ func (ec *executionContext) _Query_comoditiesByCategory(ctx context.Context, fie
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ComoditiesByCategory(rctx, args["limit"].(*int), args["page"].(*int))
+		return ec.resolvers.Query().ComoditiesWithCategories(rctx, args["limit"].(*int), args["page"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2741,6 +3114,48 @@ func (ec *executionContext) _Query_comoditiesByCategory(ctx context.Context, fie
 	res := resTmp.([]*model.ComodityWithCategory)
 	fc.Result = res
 	return ec.marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋmodelᚐComodityWithCategoryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_comodities_by_category(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_comodities_by_category_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ComoditiesByCategory(rctx, args["categoryID"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Comodity)
+	fc.Result = res
+	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users_by_role(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2853,6 +3268,41 @@ func (ec *executionContext) _Query_friend_list(ctx context.Context, field graphq
 	res := resTmp.([]*model.Friend)
 	fc.Result = res
 	return ec.marshalNFriend2ᚕᚖmyappᚋgraphᚋmodelᚐFriend(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_category_list(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CategoryList(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Category)
+	fc.Result = res
+	return ec.marshalNCategory2ᚕᚖmyappᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3728,14 +4178,14 @@ func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.Coll
 		Object:     "User",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Avatar(rctx, obj)
+		return obj.Avatar, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3744,9 +4194,44 @@ func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_image(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().Image(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Image)
+	fc.Result = res
+	return ec.marshalNImage2ᚖmyappᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_friends(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -5873,6 +6358,43 @@ func (ec *executionContext) _FriendOps(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var imageImplementors = []string{"Image"}
+
+func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, obj *model.Image) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Image")
+		case "id":
+			out.Values[i] = ec._Image_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "path":
+			out.Values[i] = ec._Image_path(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "link":
+			out.Values[i] = ec._Image_link(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var loginResponseImplementors = []string{"LoginResponse"}
 
 func (ec *executionContext) _LoginResponse(ctx context.Context, sel ast.SelectionSet, obj *model.LoginResponse) graphql.Marshaler {
@@ -5891,6 +6413,38 @@ func (ec *executionContext) _LoginResponse(ctx context.Context, sel ast.Selectio
 			}
 		case "user":
 			out.Values[i] = ec._LoginResponse_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var lookingForImplementors = []string{"LookingFor"}
+
+func (ec *executionContext) _LookingFor(ctx context.Context, sel ast.SelectionSet, obj *model.LookingFor) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, lookingForImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LookingFor")
+		case "user_id":
+			out.Values[i] = ec._LookingFor_user_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "item":
+			out.Values[i] = ec._LookingFor_item(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -5951,6 +6505,38 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var newImageImplementors = []string{"NewImage"}
+
+func (ec *executionContext) _NewImage(ctx context.Context, sel ast.SelectionSet, obj *model.NewImage) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, newImageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NewImage")
+		case "path":
+			out.Values[i] = ec._NewImage_path(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "link":
+			out.Values[i] = ec._NewImage_link(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5994,7 +6580,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "comoditiesByCategory":
+		case "comodities_with_categories":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -6002,7 +6588,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_comoditiesByCategory(ctx, field)
+				res = ec._Query_comodities_with_categories(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "comodities_by_category":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_comodities_by_category(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -6045,6 +6645,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_friend_list(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "category_list":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_category_list(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -6267,6 +6881,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "avatar":
+			out.Values[i] = ec._User_avatar(ctx, field, obj)
+		case "image":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -6274,7 +6890,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._User_avatar(ctx, field, obj)
+				res = ec._User_image(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "friends":
@@ -6656,6 +7275,43 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCategory2ᚕᚖmyappᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCategory2ᚖmyappᚋgraphᚋmodelᚐCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNCategory2ᚖmyappᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -6881,6 +7537,20 @@ func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.Selectio
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNImage2myappᚋgraphᚋmodelᚐImage(ctx context.Context, sel ast.SelectionSet, v model.Image) graphql.Marshaler {
+	return ec._Image(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNImage2ᚖmyappᚋgraphᚋmodelᚐImage(ctx context.Context, sel ast.SelectionSet, v *model.Image) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Image(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -7442,6 +8112,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) marshalOCategory2ᚖmyappᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Category(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comodity) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -7487,6 +8164,21 @@ func (ec *executionContext) marshalOFriend2ᚖmyappᚋgraphᚋmodelᚐFriend(ctx
 		return graphql.Null
 	}
 	return ec._Friend(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt(*v)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

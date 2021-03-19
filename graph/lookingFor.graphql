@@ -1,0 +1,4 @@
+type LookingFor {
+    user_id: ID!
+    item: String!
+}

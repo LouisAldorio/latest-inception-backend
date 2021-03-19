@@ -20,11 +20,11 @@ func (r *mutationResolver) Commodity(ctx context.Context) (*model.CommodityOps, 
 }
 
 func (r *mutationResolver) Schedule(ctx context.Context) (*model.ScheduleOps, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &model.ScheduleOps{}, nil
 }
 
 func (r *mutationResolver) Friends(ctx context.Context) (*model.FriendOps, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &model.FriendOps{}, nil
 }
 
 func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
@@ -38,8 +38,12 @@ func (r *queryResolver) Comodities(ctx context.Context, limit *int, page *int) (
 	}, nil
 }
 
-func (r *queryResolver) ComoditiesByCategory(ctx context.Context, limit *int, page *int) ([]*model.ComodityWithCategory, error) {
+func (r *queryResolver) ComoditiesWithCategories(ctx context.Context, limit *int, page *int) ([]*model.ComodityWithCategory, error) {
 	return service.ComodityWithCategoryGet(ctx, limit, page)
+}
+
+func (r *queryResolver) ComoditiesByCategory(ctx context.Context, categoryID int) ([]*model.Comodity, error) {
+	return service.ComodityGetByCategoryID(ctx, categoryID, nil, nil)
 }
 
 func (r *queryResolver) UsersByRole(ctx context.Context, role string) ([]*model.User, error) {
@@ -52,6 +56,10 @@ func (r *queryResolver) ScheduleByUser(ctx context.Context) ([]*model.Schedule, 
 
 func (r *queryResolver) FriendList(ctx context.Context) ([]*model.Friend, error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) CategoryList(ctx context.Context) ([]*model.Category, error) {
+	return service.CategoryGetList(ctx)
 }
 
 // Mutation returns generated.MutationResolver implementation.

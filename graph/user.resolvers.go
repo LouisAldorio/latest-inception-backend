@@ -11,9 +11,8 @@ import (
 	"myapp/service"
 )
 
-func (r *userResolver) Avatar(ctx context.Context, obj *model.User) (*string, error) {
-	var temp = "https://images.unsplash.com/photo-1615943168243-5b2503679e47?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
-	return &temp, nil
+func (r *userResolver) Image(ctx context.Context, obj *model.User) (*model.Image, error) {
+	return service.ImageGetByID(ctx, obj.Avatar)
 }
 
 func (r *userResolver) Friends(ctx context.Context, obj *model.User) ([]*model.User, error) {
@@ -21,7 +20,7 @@ func (r *userResolver) Friends(ctx context.Context, obj *model.User) ([]*model.U
 }
 
 func (r *userResolver) LookingFor(ctx context.Context, obj *model.User) ([]string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.LookingForGetByUserID(ctx)
 }
 
 func (r *userResolver) Comodity(ctx context.Context, obj *model.User) ([]*model.Comodity, error) {
@@ -37,7 +36,7 @@ func (r *userOpsResolver) Login(ctx context.Context, obj *model.UserOps, input m
 }
 
 func (r *userOpsResolver) Update(ctx context.Context, obj *model.UserOps, input model.EditUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.UserUpdate(ctx, input)
 }
 
 func (r *userOpsResolver) DeleteUser(ctx context.Context, obj *model.UserOps, username string) (*bool, error) {

@@ -56,6 +56,12 @@ type FriendOps struct {
 	Add *User `json:"add"`
 }
 
+type Image struct {
+	ID   int    `json:"id"`
+	Path string `json:"path"`
+	Link string `json:"link"`
+}
+
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -66,6 +72,11 @@ type LoginResponse struct {
 	User        *User  `json:"user"`
 }
 
+type LookingFor struct {
+	UserID int    `json:"user_id"`
+	Item   string `json:"item"`
+}
+
 type NewComodity struct {
 	Name        string    `json:"name"`
 	UnitPrice   float64   `json:"unit_price"`
@@ -74,6 +85,11 @@ type NewComodity struct {
 	Description *string   `json:"description"`
 	CategoryID  int       `json:"category_id"`
 	Images      []*string `json:"images"`
+}
+
+type NewImage struct {
+	Path string `json:"path"`
+	Link string `json:"link"`
 }
 
 type NewSchedule struct {

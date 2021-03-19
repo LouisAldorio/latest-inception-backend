@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"myapp/auth"
 	"myapp/config"
 	"myapp/graph/model"
 	"myapp/tool"
@@ -58,4 +59,33 @@ func UserGetByRole(ctx context.Context, role string) ([]*model.User, error) {
 	err := db.Table("user").Where("role = ?", role).Find(&users).Error
 
 	return users, err
+}
+
+func UserUpdate(ctx context.Context, input model.EditUser) (*model.User, error) {
+	var userID = auth.ForContext(ctx).ID
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	image, err := ImageCreate(ctx, model.NewImage{
+		Path: "",
+		Link: input.Avatar,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	user := map[string]interface{}{
+		"email":    input.Email,
+		"whatsapp": input.Whatsapp,
+		"avatar":   image.ID,
+	}
+
+	if err := db.Table("user").Where("id = ?", userID).Updates(&user).Error; err != nil {
+		return nil, err
+	}
+
+	LookingForCreate(ctx, userID, input.LookingFor)
+
+	return UserGetByID(ctx, userID)
 }

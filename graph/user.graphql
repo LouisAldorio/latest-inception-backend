@@ -7,7 +7,8 @@ type User {
     password: String!
     created_at: Time!
     updated_at: Time!
-    avatar: String @goField(forceResolver: true)
+    avatar: ID 
+    image: Image! @goField(forceResolver: true)
     friends: [User!] @goField(forceResolver: true)
     looking_for: [String!] @goField(forceResolver: true)
     comodity: [Comodity!] @goField(forceResolver:true)

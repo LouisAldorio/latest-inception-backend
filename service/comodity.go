@@ -145,3 +145,14 @@ func ComodityGetCountByCategoryID(ctx context.Context, categoryID int, limit, pa
 
 	return int(count), err
 }
+
+// func ComodityGetByCategoryID(ctx context.Context, categoryID int) ([]*model.Comodity, error) {
+// 	var comodities []*model.Comodity
+
+// 	db, sql := config.ConnectDB()
+// 	defer sql.Close()
+
+// 	err := db.Table("comodity").Where("category_id = ?", categoryID).Find(&comodities).Error
+
+// 	return comodities, err
+// }

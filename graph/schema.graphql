@@ -1,17 +1,19 @@
 scalar Time
 
 type Mutation {
-    user: UserOps! @goField(forceResolver:true)
-    commodity: CommodityOps! @goField(forceResolver:true)
-    schedule: ScheduleOps! @goField(forceResolver: true)
-    friends: FriendOps! @goField(forceResolver: true)
+    user: UserOps! 
+    commodity: CommodityOps! 
+    schedule: ScheduleOps! 
+    friends: FriendOps!
 }
 
 type Query {
     user_by_username(username: String!): User!
     comodities(limit: Int, page: Int): ComodityPagination!
-    comoditiesByCategory(limit: Int, page: Int): [ComodityWithCategory!]!
+    comodities_with_categories(limit: Int, page: Int): [ComodityWithCategory!]!
+    comodities_by_category(categoryID: Int!): [Comodity!]!
     users_by_role(role: String!): [User!]!
-    schedule_by_user: [Schedule]! @goField(forceResolver: true)
-    friend_list: [Friend]! @goField(forceResolver: true)
+    schedule_by_user: [Schedule]! 
+    friend_list: [Friend]! 
+    category_list: [Category]!     
 }

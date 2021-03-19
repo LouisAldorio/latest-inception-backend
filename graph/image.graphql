@@ -1,0 +1,10 @@
+type Image {
+    id: ID!
+    path: String!
+    link: String!
+}
+
+type NewImage {
+    path: String!
+    link: String!
+}
