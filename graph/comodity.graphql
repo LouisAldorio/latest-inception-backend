@@ -20,7 +20,7 @@ type ComodityWithCategory {
     category_id: ID!
     category: Category! 
     total_item: Int! @goField(forceResolver: true)
-    nodes: [Comodity!]! @goField(forceResolver: true)
+    nodes: [Comodity]! @goField(forceResolver: true)
 }
 
 input NewComodity {
@@ -30,14 +30,19 @@ input NewComodity {
     min_purchase: Int!
     description: String
     category_id: ID!
-    images: [String]!
+    images: [String!]!
+}
+
+type ComodityImage {
+    comodity_id: Int!
+    image_id: Int!
 }
 
 type ComodityPagination {
     limit: Int
     page: Int
     total_item: Int! @goField(forceResolver: true)
-    nodes: [Comodity!]! @goField(forceResolver: true)
+    nodes: [Comodity]! @goField(forceResolver: true)
 }
 
 type CommodityOps {

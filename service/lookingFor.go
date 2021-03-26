@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"myapp/auth"
 	"myapp/config"
 	"myapp/graph/model"
 )
@@ -26,10 +25,8 @@ func LookingForCreate(ctx context.Context, userID int, input []string) ([]*model
 	return lookingFor, err
 }
 
-func LookingForGetByUserID(ctx context.Context) ([]string, error) {
-	var userID = auth.ForContext(ctx).ID
-
-	var result []string
+func LookingForGetByUserID(ctx context.Context, userID int) ([]*string, error) {
+	var result []*string
 
 	db, sql := config.ConnectDB()
 	defer sql.Close()

@@ -51,6 +51,7 @@ func ComodityGetList(ctx context.Context, limit, page *int) ([]*model.Comodity, 
 
 func ComodityCreate(ctx context.Context, input model.NewComodity) (*model.Comodity, error) {
 	var user = auth.ForContext(ctx)
+	var newImages []*model.NewImage
 
 	var comodity = model.Comodity{
 		Name:        input.Name,
@@ -68,8 +69,21 @@ func ComodityCreate(ctx context.Context, input model.NewComodity) (*model.Comodi
 	defer sql.Close()
 
 	err := db.Table("comodity").Omit("image").Create(&comodity).Error
+	if err != nil {
+		return nil, err
+	}
 
-	return &comodity, err
+	for _, k := range input.Images {
+		newImage := model.NewImage{
+			Path: "",
+			Link: k,
+		}
+
+		newImages = append(newImages, &newImage)
+	}
+	_, err = ComodityImageCreate(ctx, newImages, comodity.ID)
+
+	return &comodity, nil
 }
 
 func ComodityGetByUserID(ctx context.Context, userID int) ([]*model.Comodity, error) {

@@ -19,8 +19,8 @@ func (r *userResolver) Friends(ctx context.Context, obj *model.User) ([]*model.U
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *userResolver) LookingFor(ctx context.Context, obj *model.User) ([]string, error) {
-	return service.LookingForGetByUserID(ctx)
+func (r *userResolver) LookingFor(ctx context.Context, obj *model.User) ([]*string, error) {
+	return service.LookingForGetByUserID(ctx, obj.ID)
 }
 
 func (r *userResolver) Comodity(ctx context.Context, obj *model.User) ([]*model.Comodity, error) {

@@ -82,6 +82,11 @@ type ComplexityRoot struct {
 		UserID      func(childComplexity int) int
 	}
 
+	ComodityImage struct {
+		ComodityID func(childComplexity int) int
+		ImageID    func(childComplexity int) int
+	}
+
 	ComodityPagination struct {
 		Limit     func(childComplexity int) int
 		Nodes     func(childComplexity int) int
@@ -240,7 +245,7 @@ type ScheduleOpsResolver interface {
 type UserResolver interface {
 	Image(ctx context.Context, obj *model.User) (*model.Image, error)
 	Friends(ctx context.Context, obj *model.User) ([]*model.User, error)
-	LookingFor(ctx context.Context, obj *model.User) ([]string, error)
+	LookingFor(ctx context.Context, obj *model.User) ([]*string, error)
 	Comodity(ctx context.Context, obj *model.User) ([]*model.Comodity, error)
 }
 type UserOpsResolver interface {
@@ -393,6 +398,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comodity.UserID(childComplexity), true
+
+	case "ComodityImage.comodity_id":
+		if e.complexity.ComodityImage.ComodityID == nil {
+			break
+		}
+
+		return e.complexity.ComodityImage.ComodityID(childComplexity), true
+
+	case "ComodityImage.image_id":
+		if e.complexity.ComodityImage.ImageID == nil {
+			break
+		}
+
+		return e.complexity.ComodityImage.ImageID(childComplexity), true
 
 	case "ComodityPagination.limit":
 		if e.complexity.ComodityPagination.Limit == nil {
@@ -1004,7 +1023,7 @@ type ComodityWithCategory {
     category_id: ID!
     category: Category! 
     total_item: Int! @goField(forceResolver: true)
-    nodes: [Comodity!]! @goField(forceResolver: true)
+    nodes: [Comodity]! @goField(forceResolver: true)
 }
 
 input NewComodity {
@@ -1014,14 +1033,19 @@ input NewComodity {
     min_purchase: Int!
     description: String
     category_id: ID!
-    images: [String]!
+    images: [String!]!
+}
+
+type ComodityImage {
+    comodity_id: Int!
+    image_id: Int!
 }
 
 type ComodityPagination {
     limit: Int
     page: Int
     total_item: Int! @goField(forceResolver: true)
-    nodes: [Comodity!]! @goField(forceResolver: true)
+    nodes: [Comodity]! @goField(forceResolver: true)
 }
 
 type CommodityOps {
@@ -1108,9 +1132,9 @@ type Mutation {
 type Query {
     user_by_username(username: String!): User!
     comodities(limit: Int, page: Int): ComodityPagination!
-    comodities_with_categories(limit: Int, page: Int): [ComodityWithCategory!]!
-    comodities_by_category(categoryID: Int!): [Comodity!]!
-    users_by_role(role: String!): [User!]!
+    comodities_with_categories(limit: Int, page: Int): [ComodityWithCategory]!
+    comodities_by_category(categoryID: Int!): [Comodity]!
+    users_by_role(role: String!): [User]!
     schedule_by_user: [Schedule]! 
     friend_list: [Friend]! 
     category_list: [Category]!     
@@ -1127,9 +1151,9 @@ type Query {
     updated_at: Time!
     avatar: ID 
     image: Image! @goField(forceResolver: true)
-    friends: [User!] @goField(forceResolver: true)
-    looking_for: [String!] @goField(forceResolver: true)
-    comodity: [Comodity!] @goField(forceResolver:true)
+    friends: [User]! @goField(forceResolver: true)
+    looking_for: [String]! @goField(forceResolver: true)
+    comodity: [Comodity]! @goField(forceResolver:true)
 }
 
 input NewUser {
@@ -2085,6 +2109,76 @@ func (ec *executionContext) _Comodity_user(ctx context.Context, field graphql.Co
 	return ec.marshalNUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ComodityImage_comodity_id(ctx context.Context, field graphql.CollectedField, obj *model.ComodityImage) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ComodityImage",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ComodityID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ComodityImage_image_id(ctx context.Context, field graphql.CollectedField, obj *model.ComodityImage) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ComodityImage",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ComodityPagination_limit(ctx context.Context, field graphql.CollectedField, obj *model.ComodityPagination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2216,7 +2310,7 @@ func (ec *executionContext) _ComodityPagination_nodes(ctx context.Context, field
 	}
 	res := resTmp.([]*model.Comodity)
 	fc.Result = res
-	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx, field.Selections, res)
+	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ComodityWithCategory_limit(ctx context.Context, field graphql.CollectedField, obj *model.ComodityWithCategory) (ret graphql.Marshaler) {
@@ -2420,7 +2514,7 @@ func (ec *executionContext) _ComodityWithCategory_nodes(ctx context.Context, fie
 	}
 	res := resTmp.([]*model.Comodity)
 	fc.Result = res
-	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx, field.Selections, res)
+	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Friend_username(ctx context.Context, field graphql.CollectedField, obj *model.Friend) (ret graphql.Marshaler) {
@@ -3113,7 +3207,7 @@ func (ec *executionContext) _Query_comodities_with_categories(ctx context.Contex
 	}
 	res := resTmp.([]*model.ComodityWithCategory)
 	fc.Result = res
-	return ec.marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋmodelᚐComodityWithCategoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋmodelᚐComodityWithCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_comodities_by_category(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3155,7 +3249,7 @@ func (ec *executionContext) _Query_comodities_by_category(ctx context.Context, f
 	}
 	res := resTmp.([]*model.Comodity)
 	fc.Result = res
-	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx, field.Selections, res)
+	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users_by_role(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3197,7 +3291,7 @@ func (ec *executionContext) _Query_users_by_role(ctx context.Context, field grap
 	}
 	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖmyappᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖmyappᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_schedule_by_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4259,11 +4353,14 @@ func (ec *executionContext) _User_friends(ctx context.Context, field graphql.Col
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalOUser2ᚕᚖmyappᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖmyappᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_looking_for(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -4291,11 +4388,14 @@ func (ec *executionContext) _User_looking_for(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]*string)
 	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalNString2ᚕᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_comodity(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -4323,11 +4423,14 @@ func (ec *executionContext) _User_comodity(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.([]*model.Comodity)
 	fc.Result = res
-	return ec.marshalOComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx, field.Selections, res)
+	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserOps_register(ctx context.Context, field graphql.CollectedField, obj *model.UserOps) (ret graphql.Marshaler) {
@@ -5820,7 +5923,7 @@ func (ec *executionContext) unmarshalInputNewComodity(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("images"))
-			it.Images, err = ec.unmarshalNString2ᚕᚖstring(ctx, v)
+			it.Images, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6152,6 +6255,38 @@ func (ec *executionContext) _Comodity(ctx context.Context, sel ast.SelectionSet,
 				}
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var comodityImageImplementors = []string{"ComodityImage"}
+
+func (ec *executionContext) _ComodityImage(ctx context.Context, sel ast.SelectionSet, obj *model.ComodityImage) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, comodityImageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ComodityImage")
+		case "comodity_id":
+			out.Values[i] = ec._ComodityImage_comodity_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "image_id":
+			out.Values[i] = ec._ComodityImage_image_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6905,6 +7040,9 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_friends(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "looking_for":
@@ -6916,6 +7054,9 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_looking_for(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "comodity":
@@ -6927,6 +7068,9 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_comodity(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		default:
@@ -7340,7 +7484,7 @@ func (ec *executionContext) marshalNComodity2myappᚋgraphᚋmodelᚐComodity(ct
 	return ec._Comodity(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comodity) graphql.Marshaler {
+func (ec *executionContext) marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodity(ctx context.Context, sel ast.SelectionSet, v []*model.Comodity) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -7364,7 +7508,7 @@ func (ec *executionContext) marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComod
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComodity2ᚖmyappᚋgraphᚋmodelᚐComodity(ctx, sel, v[i])
+			ret[i] = ec.marshalOComodity2ᚖmyappᚋgraphᚋmodelᚐComodity(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7401,7 +7545,7 @@ func (ec *executionContext) marshalNComodityPagination2ᚖmyappᚋgraphᚋmodel�
 	return ec._ComodityPagination(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋmodelᚐComodityWithCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ComodityWithCategory) graphql.Marshaler {
+func (ec *executionContext) marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋmodelᚐComodityWithCategory(ctx context.Context, sel ast.SelectionSet, v []*model.ComodityWithCategory) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -7425,7 +7569,7 @@ func (ec *executionContext) marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋm
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComodityWithCategory2ᚖmyappᚋgraphᚋmodelᚐComodityWithCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalOComodityWithCategory2ᚖmyappᚋgraphᚋmodelᚐComodityWithCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7436,16 +7580,6 @@ func (ec *executionContext) marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋm
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) marshalNComodityWithCategory2ᚖmyappᚋgraphᚋmodelᚐComodityWithCategory(ctx context.Context, sel ast.SelectionSet, v *model.ComodityWithCategory) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._ComodityWithCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNEditSchedule2myappᚋgraphᚋmodelᚐEditSchedule(ctx context.Context, v interface{}) (model.EditSchedule, error) {
@@ -7798,43 +7932,6 @@ func (ec *executionContext) marshalNUser2ᚕᚖmyappᚋgraphᚋmodelᚐUser(ctx 
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖmyappᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalNUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -8119,44 +8216,18 @@ func (ec *executionContext) marshalOCategory2ᚖmyappᚋgraphᚋmodelᚐCategory
 	return ec._Category(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodityᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comodity) graphql.Marshaler {
+func (ec *executionContext) marshalOComodity2ᚖmyappᚋgraphᚋmodelᚐComodity(ctx context.Context, sel ast.SelectionSet, v *model.Comodity) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNComodity2ᚖmyappᚋgraphᚋmodelᚐComodity(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
+	return ec._Comodity(ctx, sel, v)
+}
 
+func (ec *executionContext) marshalOComodityWithCategory2ᚖmyappᚋgraphᚋmodelᚐComodityWithCategory(ctx context.Context, sel ast.SelectionSet, v *model.ComodityWithCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
 	}
-	wg.Wait()
-	return ret
+	return ec._ComodityWithCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOFriend2ᚖmyappᚋgraphᚋmodelᚐFriend(ctx context.Context, sel ast.SelectionSet, v *model.Friend) graphql.Marshaler {
@@ -8212,42 +8283,6 @@ func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.S
 	return graphql.MarshalString(v)
 }
 
-func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
-	}
-
-	return ret
-}
-
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -8276,46 +8311,6 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 		return graphql.Null
 	}
 	return graphql.MarshalTime(*v)
-}
-
-func (ec *executionContext) marshalOUser2ᚕᚖmyappᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
 }
 
 func (ec *executionContext) marshalOUser2ᚖmyappᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

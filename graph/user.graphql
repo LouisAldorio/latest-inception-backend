@@ -9,9 +9,9 @@ type User {
     updated_at: Time!
     avatar: ID 
     image: Image! @goField(forceResolver: true)
-    friends: [User!] @goField(forceResolver: true)
-    looking_for: [String!] @goField(forceResolver: true)
-    comodity: [Comodity!] @goField(forceResolver:true)
+    friends: [User]! @goField(forceResolver: true)
+    looking_for: [String]! @goField(forceResolver: true)
+    comodity: [Comodity]! @goField(forceResolver:true)
 }
 
 input NewUser {

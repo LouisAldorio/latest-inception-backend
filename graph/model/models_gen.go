@@ -12,6 +12,11 @@ type CommodityOps struct {
 	Update *Comodity `json:"update"`
 }
 
+type ComodityImage struct {
+	ComodityID int `json:"comodity_id"`
+	ImageID    int `json:"image_id"`
+}
+
 type ComodityPagination struct {
 	Limit     *int        `json:"limit"`
 	Page      *int        `json:"page"`
@@ -78,13 +83,13 @@ type LookingFor struct {
 }
 
 type NewComodity struct {
-	Name        string    `json:"name"`
-	UnitPrice   float64   `json:"unit_price"`
-	UnitType    string    `json:"unit_type"`
-	MinPurchase int       `json:"min_purchase"`
-	Description *string   `json:"description"`
-	CategoryID  int       `json:"category_id"`
-	Images      []*string `json:"images"`
+	Name        string   `json:"name"`
+	UnitPrice   float64  `json:"unit_price"`
+	UnitType    string   `json:"unit_type"`
+	MinPurchase int      `json:"min_purchase"`
+	Description *string  `json:"description"`
+	CategoryID  int      `json:"category_id"`
+	Images      []string `json:"images"`
 }
 
 type NewImage struct {
