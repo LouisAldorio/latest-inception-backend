@@ -26,9 +26,16 @@ func (r *comodityResolver) Image(ctx context.Context, obj *model.Comodity) ([]*s
 	// var img4 = "https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
 	// var img5 = "https://images.unsplash.com/photo-1615879965520-cde89ea80726?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1000&q=80"
 	// var img6 = "https://images.unsplash.com/photo-1615839031296-a23180ec04ba?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1000&q=80"
-	// var temp = []*string{&img1, &img2, &img3, &img4, &img5, &img6}
+	var img1 = "https://via.placeholder.com/500"
+	var temp = []*string{&img1}
 
-	return service.ImageGetByComodityID(ctx, obj.ID)
+	images, err := service.ImageGetByComodityID(ctx, obj.ID)
+
+	if len(images) < 1 {
+		return temp, err
+	}
+
+	return images, err
 }
 
 func (r *comodityResolver) User(ctx context.Context, obj *model.Comodity) (*model.User, error) {

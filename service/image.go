@@ -94,7 +94,7 @@ func ImageGetByComodityID(ctx context.Context, comodityID int) ([]*string, error
 	db, sql := config.ConnectDB()
 	defer sql.Close()
 
-	err := db.Table("comodity_image").Select("image_id").Find(&imageID).Error
+	err := db.Table("comodity_image").Select("image_id").Where("comodity_id = ?", comodityID).Find(&imageID).Error
 	if err != nil {
 		return nil, err
 	}
