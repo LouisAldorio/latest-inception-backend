@@ -106,3 +106,27 @@ func ImageGetByComodityID(ctx context.Context, comodityID int) ([]*string, error
 
 	return image, nil
 }
+
+func ImageGetByComodityIDs(ctx context.Context, comodityIDs []int) ([]*model.ImageWithComodityID, error) {
+	var image []*model.ImageWithComodityID
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	// err := db.Table("comodity_image").Select("image_id, comodity_id").Where("comodity_id IN (?)", comodityIDs).Find(&image).Error
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	err := db.Table("comodity_image").Joins("inner join image on comodity_image.image_id = image.id").Select("comodity_image.comodity_id, comodity_image.image_id, image.link").Find(&image).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// err = db.Table("image").Select("link").Where("id IN (?)", imageID).Find(&image).Error
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	return image, nil
+}

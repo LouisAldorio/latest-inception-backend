@@ -4,6 +4,7 @@ import (
 	"log"
 	"myapp/auth"
 	"myapp/config"
+	"myapp/dataloader"
 	"myapp/directive"
 	"myapp/graph"
 	"myapp/graph/generated"
@@ -29,6 +30,7 @@ func main() {
 
 	router := chi.NewRouter()
 	router.Use(auth.AuthMiddleware)
+	router.Use(dataloader.LoaderMiddleware)
 
 	c := generated.Config{Resolvers: &graph.Resolver{}}
 	c.Directives.HasRole = directive.HasRole
