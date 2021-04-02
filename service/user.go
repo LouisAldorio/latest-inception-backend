@@ -50,6 +50,17 @@ func UserGetByID(ctx context.Context, id int) (*model.User, error) {
 	return &user, err
 }
 
+func UserGetByIDs(ctx context.Context, ids []int) ([]*model.User, error) {
+	var users []*model.User
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	err := db.Table("user").Where("id IN (?)", ids).Find(&users).Error
+
+	return users, err
+}
+
 func UserGetByRole(ctx context.Context, role string) ([]*model.User, error) {
 	var users []*model.User
 

@@ -1,8 +1,8 @@
 type Friend {
-    username: String!
+    user_id: ID!
     user: User! @goField(forceResolver: true)
 }
 
 type FriendOps {
-    add(friends: [String]!): User! @goField(forceResolver: true)
+    add(user_id: Int!): User! @goField(forceResolver: true)
 }

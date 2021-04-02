@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"myapp/auth"
 	"myapp/graph/generated"
 	"myapp/graph/model"
 	"myapp/service"
@@ -55,7 +56,8 @@ func (r *queryResolver) ScheduleByUser(ctx context.Context) ([]*model.Schedule, 
 }
 
 func (r *queryResolver) FriendList(ctx context.Context) ([]*model.Friend, error) {
-	panic(fmt.Errorf("not implemented"))
+	var userID = auth.ForContext(ctx).ID
+	return service.FriendGetByUserID(ctx, userID)
 }
 
 func (r *queryResolver) CategoryList(ctx context.Context) ([]*model.Category, error) {

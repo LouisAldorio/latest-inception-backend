@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 
 	CommodityOps struct {
 		Create func(childComplexity int, input model.NewComodity) int
-		Update func(childComplexity int, input model.NewComodity) int
+		Update func(childComplexity int, input model.EditComodity) int
 	}
 
 	Comodity struct {
@@ -104,12 +104,12 @@ type ComplexityRoot struct {
 	}
 
 	Friend struct {
-		User     func(childComplexity int) int
-		Username func(childComplexity int) int
+		User   func(childComplexity int) int
+		UserID func(childComplexity int) int
 	}
 
 	FriendOps struct {
-		Add func(childComplexity int, friends []*string) int
+		Add func(childComplexity int, userID int) int
 	}
 
 	Image struct {
@@ -152,17 +152,17 @@ type ComplexityRoot struct {
 	}
 
 	Schedule struct {
-		CommodityName         func(childComplexity int) int
-		Day                   func(childComplexity int) int
-		DealedUnit            func(childComplexity int) int
-		EndDate               func(childComplexity int) int
-		EndTime               func(childComplexity int) int
-		ID                    func(childComplexity int) int
-		InvolvedUsers         func(childComplexity int) int
-		InvolvedUsersUsername func(childComplexity int) int
-		ScheduleName          func(childComplexity int) int
-		StartDate             func(childComplexity int) int
-		StartTime             func(childComplexity int) int
+		CommodityName  func(childComplexity int) int
+		Day            func(childComplexity int) int
+		DealedUnit     func(childComplexity int) int
+		EndDate        func(childComplexity int) int
+		EndTime        func(childComplexity int) int
+		ID             func(childComplexity int) int
+		InvolvedUserID func(childComplexity int) int
+		InvolvedUsers  func(childComplexity int) int
+		ScheduleName   func(childComplexity int) int
+		StartDate      func(childComplexity int) int
+		StartTime      func(childComplexity int) int
 	}
 
 	ScheduleOps struct {
@@ -197,7 +197,7 @@ type ComplexityRoot struct {
 
 type CommodityOpsResolver interface {
 	Create(ctx context.Context, obj *model.CommodityOps, input model.NewComodity) (*model.Comodity, error)
-	Update(ctx context.Context, obj *model.CommodityOps, input model.NewComodity) (*model.Comodity, error)
+	Update(ctx context.Context, obj *model.CommodityOps, input model.EditComodity) (*model.Comodity, error)
 }
 type ComodityResolver interface {
 	Image(ctx context.Context, obj *model.Comodity) ([]*string, error)
@@ -216,7 +216,7 @@ type FriendResolver interface {
 	User(ctx context.Context, obj *model.Friend) (*model.User, error)
 }
 type FriendOpsResolver interface {
-	Add(ctx context.Context, obj *model.FriendOps, friends []*string) (*model.User, error)
+	Add(ctx context.Context, obj *model.FriendOps, userID int) (*model.User, error)
 }
 type MutationResolver interface {
 	User(ctx context.Context) (*model.UserOps, error)
@@ -235,6 +235,7 @@ type QueryResolver interface {
 	CategoryList(ctx context.Context) ([]*model.Category, error)
 }
 type ScheduleResolver interface {
+	InvolvedUserID(ctx context.Context, obj *model.Schedule) ([]*int, error)
 	InvolvedUsers(ctx context.Context, obj *model.Schedule) ([]*model.User, error)
 }
 type ScheduleOpsResolver interface {
@@ -244,7 +245,7 @@ type ScheduleOpsResolver interface {
 }
 type UserResolver interface {
 	Image(ctx context.Context, obj *model.User) (*model.Image, error)
-	Friends(ctx context.Context, obj *model.User) ([]*model.User, error)
+	Friends(ctx context.Context, obj *model.User) ([]*model.Friend, error)
 	LookingFor(ctx context.Context, obj *model.User) ([]*string, error)
 	Comodity(ctx context.Context, obj *model.User) ([]*model.Comodity, error)
 }
@@ -306,7 +307,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.CommodityOps.Update(childComplexity, args["input"].(model.NewComodity)), true
+		return e.complexity.CommodityOps.Update(childComplexity, args["input"].(model.EditComodity)), true
 
 	case "Comodity.category_id":
 		if e.complexity.Comodity.CategoryID == nil {
@@ -490,12 +491,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Friend.User(childComplexity), true
 
-	case "Friend.username":
-		if e.complexity.Friend.Username == nil {
+	case "Friend.user_id":
+		if e.complexity.Friend.UserID == nil {
 			break
 		}
 
-		return e.complexity.Friend.Username(childComplexity), true
+		return e.complexity.Friend.UserID(childComplexity), true
 
 	case "FriendOps.add":
 		if e.complexity.FriendOps.Add == nil {
@@ -507,7 +508,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.FriendOps.Add(childComplexity, args["friends"].([]*string)), true
+		return e.complexity.FriendOps.Add(childComplexity, args["user_id"].(int)), true
 
 	case "Image.id":
 		if e.complexity.Image.ID == nil {
@@ -723,19 +724,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Schedule.ID(childComplexity), true
 
+	case "Schedule.involved_user_id":
+		if e.complexity.Schedule.InvolvedUserID == nil {
+			break
+		}
+
+		return e.complexity.Schedule.InvolvedUserID(childComplexity), true
+
 	case "Schedule.involved_users":
 		if e.complexity.Schedule.InvolvedUsers == nil {
 			break
 		}
 
 		return e.complexity.Schedule.InvolvedUsers(childComplexity), true
-
-	case "Schedule.involved_users_username":
-		if e.complexity.Schedule.InvolvedUsersUsername == nil {
-			break
-		}
-
-		return e.complexity.Schedule.InvolvedUsersUsername(childComplexity), true
 
 	case "Schedule.schedule_name":
 		if e.complexity.Schedule.ScheduleName == nil {
@@ -1036,6 +1037,17 @@ input NewComodity {
     images: [String!]!
 }
 
+input EditComodity {
+    id: ID!
+    name: String!
+    unit_price: Float!
+    unit_type: String!
+    min_purchase: Int!
+    description: String
+    category_id: ID!
+    images: [String!]!
+}
+
 type ComodityImage {
     comodity_id: Int!
     image_id: Int!
@@ -1050,18 +1062,18 @@ type ComodityPagination {
 
 type CommodityOps {
     create(input: NewComodity!): Comodity! @goField(forceResolver:true)
-    update(input: NewComodity!): Comodity! @goField(forceResolver:true)
+    update(input: EditComodity!): Comodity! @goField(forceResolver:true)
 }`, BuiltIn: false},
 	{Name: "graph/directive.graphql", Input: `directive @goField(forceResolver: Boolean) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 directive @hasRole(role: String!) on FIELD_DEFINITION`, BuiltIn: false},
 	{Name: "graph/friend.graphql", Input: `type Friend {
-    username: String!
+    user_id: ID!
     user: User! @goField(forceResolver: true)
 }
 
 type FriendOps {
-    add(friends: [String]!): User! @goField(forceResolver: true)
+    add(user_id: Int!): User! @goField(forceResolver: true)
 }`, BuiltIn: false},
 	{Name: "graph/image.graphql", Input: `type Image {
     id: ID!
@@ -1087,7 +1099,7 @@ type NewImage {
     day: [String]!
     start_time: String!
     end_time: String!
-    involved_users_username: [String]!
+    involved_user_id: [ID]! @goField(forceResolver: true)
     involved_users: [User]! @goField(forceResolver: true)
 }
 
@@ -1100,7 +1112,7 @@ input NewSchedule {
     day: [String]!
     start_time: String!
     end_time: String!
-    involved_users_username: [String]!
+    involved_users_id: [ID]!
 }
 
 input EditSchedule {
@@ -1151,7 +1163,7 @@ type Query {
     updated_at: Time!
     avatar: ID 
     image: Image! @goField(forceResolver: true)
-    friends: [User]! @goField(forceResolver: true)
+    friends: [Friend]! @goField(forceResolver: true)
     looking_for: [String]! @goField(forceResolver: true)
     comodity: [Comodity]! @goField(forceResolver:true)
 }
@@ -1228,10 +1240,10 @@ func (ec *executionContext) field_CommodityOps_create_args(ctx context.Context, 
 func (ec *executionContext) field_CommodityOps_update_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewComodity
+	var arg0 model.EditComodity
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewComodity2myappᚋgraphᚋmodelᚐNewComodity(ctx, tmp)
+		arg0, err = ec.unmarshalNEditComodity2myappᚋgraphᚋmodelᚐEditComodity(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1243,15 +1255,15 @@ func (ec *executionContext) field_CommodityOps_update_args(ctx context.Context, 
 func (ec *executionContext) field_FriendOps_add_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*string
-	if tmp, ok := rawArgs["friends"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("friends"))
-		arg0, err = ec.unmarshalNString2ᚕᚖstring(ctx, tmp)
+	var arg0 int
+	if tmp, ok := rawArgs["user_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["friends"] = arg0
+	args["user_id"] = arg0
 	return args, nil
 }
 
@@ -1643,7 +1655,7 @@ func (ec *executionContext) _CommodityOps_update(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CommodityOps().Update(rctx, obj, args["input"].(model.NewComodity))
+		return ec.resolvers.CommodityOps().Update(rctx, obj, args["input"].(model.EditComodity))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2517,7 +2529,7 @@ func (ec *executionContext) _ComodityWithCategory_nodes(ctx context.Context, fie
 	return ec.marshalNComodity2ᚕᚖmyappᚋgraphᚋmodelᚐComodity(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Friend_username(ctx context.Context, field graphql.CollectedField, obj *model.Friend) (ret graphql.Marshaler) {
+func (ec *executionContext) _Friend_user_id(ctx context.Context, field graphql.CollectedField, obj *model.Friend) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2535,7 +2547,7 @@ func (ec *executionContext) _Friend_username(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Username, nil
+		return obj.UserID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2547,9 +2559,9 @@ func (ec *executionContext) _Friend_username(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Friend_user(ctx context.Context, field graphql.CollectedField, obj *model.Friend) (ret graphql.Marshaler) {
@@ -2612,7 +2624,7 @@ func (ec *executionContext) _FriendOps_add(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.FriendOps().Add(rctx, obj, args["friends"].([]*string))
+		return ec.resolvers.FriendOps().Add(rctx, obj, args["user_id"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3785,7 +3797,7 @@ func (ec *executionContext) _Schedule_end_time(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Schedule_involved_users_username(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
+func (ec *executionContext) _Schedule_involved_user_id(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3796,14 +3808,14 @@ func (ec *executionContext) _Schedule_involved_users_username(ctx context.Contex
 		Object:     "Schedule",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.InvolvedUsersUsername, nil
+		return ec.resolvers.Schedule().InvolvedUserID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3815,9 +3827,9 @@ func (ec *executionContext) _Schedule_involved_users_username(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*string)
+	res := resTmp.([]*int)
 	fc.Result = res
-	return ec.marshalNString2ᚕᚖstring(ctx, field.Selections, res)
+	return ec.marshalNID2ᚕᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Schedule_involved_users(ctx context.Context, field graphql.CollectedField, obj *model.Schedule) (ret graphql.Marshaler) {
@@ -4358,9 +4370,9 @@ func (ec *executionContext) _User_friends(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.User)
+	res := resTmp.([]*model.Friend)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖmyappᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNFriend2ᚕᚖmyappᚋgraphᚋmodelᚐFriend(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_looking_for(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -5709,6 +5721,82 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputEditComodity(ctx context.Context, obj interface{}) (model.EditComodity, error) {
+	var it model.EditComodity
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unit_price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unit_price"))
+			it.UnitPrice, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unit_type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unit_type"))
+			it.UnitType, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "min_purchase":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min_purchase"))
+			it.MinPurchase, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "category_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category_id"))
+			it.CategoryID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "images":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("images"))
+			it.Images, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEditSchedule(ctx context.Context, obj interface{}) (model.EditSchedule, error) {
 	var it model.EditSchedule
 	var asMap = obj.(map[string]interface{})
@@ -6003,11 +6091,11 @@ func (ec *executionContext) unmarshalInputNewSchedule(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "involved_users_username":
+		case "involved_users_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("involved_users_username"))
-			it.InvolvedUsersUsername, err = ec.unmarshalNString2ᚕᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("involved_users_id"))
+			it.InvolvedUsersID, err = ec.unmarshalNID2ᚕᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6427,8 +6515,8 @@ func (ec *executionContext) _Friend(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Friend")
-		case "username":
-			out.Values[i] = ec._Friend_username(ctx, field, obj)
+		case "user_id":
+			out.Values[i] = ec._Friend_user_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -6870,11 +6958,20 @@ func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "involved_users_username":
-			out.Values[i] = ec._Schedule_involved_users_username(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+		case "involved_user_id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Schedule_involved_user_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "involved_users":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -7582,6 +7679,11 @@ func (ec *executionContext) marshalNComodityWithCategory2ᚕᚖmyappᚋgraphᚋm
 	return ret
 }
 
+func (ec *executionContext) unmarshalNEditComodity2myappᚋgraphᚋmodelᚐEditComodity(ctx context.Context, v interface{}) (model.EditComodity, error) {
+	res, err := ec.unmarshalInputEditComodity(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNEditSchedule2myappᚋgraphᚋmodelᚐEditSchedule(ctx context.Context, v interface{}) (model.EditSchedule, error) {
 	res, err := ec.unmarshalInputEditSchedule(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7671,6 +7773,36 @@ func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.Selectio
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNID2ᚕᚖint(ctx context.Context, v interface{}) ([]*int, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOID2ᚖint(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNID2ᚕᚖint(ctx context.Context, sel ast.SelectionSet, v []*int) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOID2ᚖint(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNImage2myappᚋgraphᚋmodelᚐImage(ctx context.Context, sel ast.SelectionSet, v model.Image) graphql.Marshaler {

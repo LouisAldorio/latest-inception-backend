@@ -33,6 +33,17 @@ type ComodityWithCategory struct {
 	Nodes      []*Comodity `json:"nodes"`
 }
 
+type EditComodity struct {
+	ID          int      `json:"id"`
+	Name        string   `json:"name"`
+	UnitPrice   float64  `json:"unit_price"`
+	UnitType    string   `json:"unit_type"`
+	MinPurchase int      `json:"min_purchase"`
+	Description *string  `json:"description"`
+	CategoryID  int      `json:"category_id"`
+	Images      []string `json:"images"`
+}
+
 type EditSchedule struct {
 	ID            string    `json:"id"`
 	ScheduleName  string    `json:"schedule_name"`
@@ -53,8 +64,8 @@ type EditUser struct {
 }
 
 type Friend struct {
-	Username string `json:"username"`
-	User     *User  `json:"user"`
+	UserID int   `json:"user_id"`
+	User   *User `json:"user"`
 }
 
 type FriendOps struct {
@@ -98,15 +109,15 @@ type NewImage struct {
 }
 
 type NewSchedule struct {
-	ScheduleName          string    `json:"schedule_name"`
-	CommodityName         string    `json:"commodity_name"`
-	DealedUnit            string    `json:"dealed_unit"`
-	StartDate             string    `json:"start_date"`
-	EndDate               string    `json:"end_date"`
-	Day                   []*string `json:"day"`
-	StartTime             string    `json:"start_time"`
-	EndTime               string    `json:"end_time"`
-	InvolvedUsersUsername []*string `json:"involved_users_username"`
+	ScheduleName    string    `json:"schedule_name"`
+	CommodityName   string    `json:"commodity_name"`
+	DealedUnit      string    `json:"dealed_unit"`
+	StartDate       string    `json:"start_date"`
+	EndDate         string    `json:"end_date"`
+	Day             []*string `json:"day"`
+	StartTime       string    `json:"start_time"`
+	EndTime         string    `json:"end_time"`
+	InvolvedUsersID []*int    `json:"involved_users_id"`
 }
 
 type NewUser struct {
@@ -119,17 +130,17 @@ type NewUser struct {
 }
 
 type Schedule struct {
-	ID                    int       `json:"id"`
-	ScheduleName          string    `json:"schedule_name"`
-	CommodityName         string    `json:"commodity_name"`
-	DealedUnit            string    `json:"dealed_unit"`
-	StartDate             string    `json:"start_date"`
-	EndDate               string    `json:"end_date"`
-	Day                   []*string `json:"day"`
-	StartTime             string    `json:"start_time"`
-	EndTime               string    `json:"end_time"`
-	InvolvedUsersUsername []*string `json:"involved_users_username"`
-	InvolvedUsers         []*User   `json:"involved_users"`
+	ID             int       `json:"id"`
+	ScheduleName   string    `json:"schedule_name"`
+	CommodityName  string    `json:"commodity_name"`
+	DealedUnit     string    `json:"dealed_unit"`
+	StartDate      string    `json:"start_date"`
+	EndDate        string    `json:"end_date"`
+	Day            []*string `json:"day"`
+	StartTime      string    `json:"start_time"`
+	EndTime        string    `json:"end_time"`
+	InvolvedUserID []*int    `json:"involved_user_id"`
+	InvolvedUsers  []*User   `json:"involved_users"`
 }
 
 type ScheduleOps struct {

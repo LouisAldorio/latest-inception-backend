@@ -10,6 +10,10 @@ import (
 	"myapp/graph/model"
 )
 
+func (r *scheduleResolver) InvolvedUserID(ctx context.Context, obj *model.Schedule) ([]*int, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *scheduleResolver) InvolvedUsers(ctx context.Context, obj *model.Schedule) ([]*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }

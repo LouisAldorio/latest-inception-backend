@@ -40,11 +40,24 @@ func ImageCreateBatch(ctx context.Context, input []*model.NewImage) ([]*model.Im
 	return images, err
 }
 
+func ComodityImageDeleteByComodityID(ctx context.Context, comodityID int) error {
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	err := db.Unscoped().Table("comodity_image").Where("comodity_id = ?", comodityID).Delete(&model.ComodityImage{}).Error
+
+	return err
+}
+
 func ComodityImageCreate(ctx context.Context, input []*model.NewImage, comodityID int) ([]*model.Image, error) {
 	var comodityImages []*model.ComodityImage
 
 	db, sql := config.ConnectDB()
 	defer sql.Close()
+
+	if err := ComodityImageDeleteByComodityID(ctx, comodityID); err != nil {
+		return nil, err
+	}
 
 	images, err := ImageCreateBatch(ctx, input)
 	if err != nil {

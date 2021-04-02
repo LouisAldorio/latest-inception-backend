@@ -33,6 +33,17 @@ input NewComodity {
     images: [String!]!
 }
 
+input EditComodity {
+    id: ID!
+    name: String!
+    unit_price: Float!
+    unit_type: String!
+    min_purchase: Int!
+    description: String
+    category_id: ID!
+    images: [String!]!
+}
+
 type ComodityImage {
     comodity_id: Int!
     image_id: Int!
@@ -47,5 +58,5 @@ type ComodityPagination {
 
 type CommodityOps {
     create(input: NewComodity!): Comodity! @goField(forceResolver:true)
-    update(input: NewComodity!): Comodity! @goField(forceResolver:true)
+    update(input: EditComodity!): Comodity! @goField(forceResolver:true)
 }

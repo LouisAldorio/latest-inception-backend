@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"myapp/dataloader"
 	"myapp/graph/generated"
 	"myapp/graph/model"
@@ -16,8 +15,8 @@ func (r *commodityOpsResolver) Create(ctx context.Context, obj *model.CommodityO
 	return service.ComodityCreate(ctx, input)
 }
 
-func (r *commodityOpsResolver) Update(ctx context.Context, obj *model.CommodityOps, input model.NewComodity) (*model.Comodity, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *commodityOpsResolver) Update(ctx context.Context, obj *model.CommodityOps, input model.EditComodity) (*model.Comodity, error) {
+	return service.ComodityUpdate(ctx, input)
 }
 
 func (r *comodityResolver) Image(ctx context.Context, obj *model.Comodity) ([]*string, error) {
@@ -50,7 +49,8 @@ func (r *comodityWithCategoryResolver) TotalItem(ctx context.Context, obj *model
 }
 
 func (r *comodityWithCategoryResolver) Nodes(ctx context.Context, obj *model.ComodityWithCategory) ([]*model.Comodity, error) {
-	return service.ComodityGetByCategoryID(ctx, obj.CategoryID, obj.Limit, obj.Page)
+	return dataloader.CtxLoaders(ctx).ComodityGetByCategoryIDLoader.Load(obj.CategoryID)
+	// return service.ComodityGetByCategoryID(ctx, obj.CategoryID, obj.Limit, obj.Page)
 }
 
 // CommodityOps returns generated.CommodityOpsResolver implementation.

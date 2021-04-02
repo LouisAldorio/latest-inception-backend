@@ -15,8 +15,8 @@ func (r *userResolver) Image(ctx context.Context, obj *model.User) (*model.Image
 	return service.ImageGetByID(ctx, obj.Avatar)
 }
 
-func (r *userResolver) Friends(ctx context.Context, obj *model.User) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *userResolver) Friends(ctx context.Context, obj *model.User) ([]*model.Friend, error) {
+	return service.FriendGetByUserID(ctx, obj.ID)
 }
 
 func (r *userResolver) LookingFor(ctx context.Context, obj *model.User) ([]*string, error) {
