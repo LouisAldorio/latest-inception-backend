@@ -21,17 +21,16 @@ func (r *commodityOpsResolver) Update(ctx context.Context, obj *model.CommodityO
 }
 
 func (r *comodityResolver) Image(ctx context.Context, obj *model.Comodity) ([]*string, error) {
-	return dataloader.CtxLoaders(ctx).ImagesGetByComodityIDLoader.Load(obj.ID)
-	// var img1 = "https://via.placeholder.com/500"
-	// var temp = []*string{&img1}
+	var img1 = "https://via.placeholder.com/500"
+	var temp = []*string{&img1}
 
-	// images, err := service.ImageGetByComodityID(ctx, obj.ID)
+	images, err := dataloader.CtxLoaders(ctx).ImagesGetByComodityIDLoader.Load(obj.ID)
 
-	// if len(images) < 1 {
-	// 	return temp, err
-	// }
+	if len(images) < 1 {
+		return temp, err
+	}
 
-	// return images, err
+	return images, err
 }
 
 func (r *comodityResolver) User(ctx context.Context, obj *model.Comodity) (*model.User, error) {
