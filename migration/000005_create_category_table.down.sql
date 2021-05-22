@@ -1,5 +1,1 @@
-BEGIN;
-
-DELETE TABLE IS EXISTS category;
-
-COMMIT;
+DROP TABLE IF EXISTS category;

@@ -1,5 +1,1 @@
-BEGIN;
-
 DELETE TABLE IS EXISTS friendship;
-
-COMMIT;

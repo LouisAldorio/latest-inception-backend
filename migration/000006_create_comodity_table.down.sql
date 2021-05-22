@@ -1,5 +1,1 @@
-BEGIN;
-
-DELETE TABLE IS EXISTS comodity;
-
-COMMIT;
+DROP TABLE IF EXISTS comodity;

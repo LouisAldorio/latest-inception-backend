@@ -1,5 +1,1 @@
-BEGIN;
-
-DELETE TABLE IS EXISTS looking_for;
-
-COMMIT;
+DROP TABLE IF EXISTS looking_for;
