@@ -1,16 +1,9 @@
-version: "3"
+version: '3'
 
-services:
-  app:
-    build:
-      dockerfile: Dockerfile.master
-      context: .
-      args:
-        VERSION: "development"
-    volumes:
-      - .:/go/src/myapp
-      - ${HOME}/go:/go
-    container_name: inception-go
-    ports:
-      - "8080:8080"
-    env_file: ".env"
+services: 
+  inception-backend:
+    image: inception-backend
+    container_name: inception-backend
+    network_mode: global-network
+    env_file: 
+      - ./.env
