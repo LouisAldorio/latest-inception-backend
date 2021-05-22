@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func main2() {
 	godotenv.Load()
 
 	m := config.MigrateSql()
