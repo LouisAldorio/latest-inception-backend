@@ -86,6 +86,43 @@ func ComodityCreate(ctx context.Context, input model.NewComodity) (*model.Comodi
 	return &comodity, nil
 }
 
+func ComodityUpdate(ctx context.Context, input model.EditComodity) (*model.Comodity, error) {
+	var user = auth.ForContext(ctx)
+	var newImages []*model.NewImage
+
+	var comodity = model.Comodity{
+		Name:        input.Name,
+		UnitPrice:   input.UnitPrice,
+		UnitType:    input.UnitType,
+		MinPurchase: input.MinPurchase,
+		Description: input.Description,
+		CategoryID:  input.CategoryID,
+		UserID:      user.ID,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	err := db.Table("comodity").Omit("image").Where("id = ?", input.ID).Updates(&comodity).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, k := range input.Images {
+		newImage := model.NewImage{
+			Path: "",
+			Link: k,
+		}
+
+		newImages = append(newImages, &newImage)
+	}
+	_, err = ComodityImageCreate(ctx, newImages, comodity.ID)
+
+	return &comodity, nil
+}
+
 func ComodityGetByUserID(ctx context.Context, userID int) ([]*model.Comodity, error) {
 	var comodities []*model.Comodity
 
@@ -158,6 +195,17 @@ func ComodityGetCountByCategoryID(ctx context.Context, categoryID int, limit, pa
 	}
 
 	return int(count), err
+}
+
+func ComodityGetByCategoryIDs(ctx context.Context, categoryIDs []int) ([]*model.Comodity, error) {
+	var comodities []*model.Comodity
+
+	db, sql := config.ConnectDB()
+	defer sql.Close()
+
+	err := db.Table("comodity").Where("category_id IN (?)", categoryIDs).Find(&comodities).Error
+
+	return comodities, err
 }
 
 // func ComodityGetByCategoryID(ctx context.Context, categoryID int) ([]*model.Comodity, error) {

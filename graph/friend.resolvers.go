@@ -5,17 +5,18 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"myapp/dataloader"
 	"myapp/graph/generated"
 	"myapp/graph/model"
+	"myapp/service"
 )
 
 func (r *friendResolver) User(ctx context.Context, obj *model.Friend) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return dataloader.CtxLoaders(ctx).UserGetByIDLoader.Load(obj.UserID)
 }
 
-func (r *friendOpsResolver) Add(ctx context.Context, obj *model.FriendOps, friends []*string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *friendOpsResolver) Add(ctx context.Context, obj *model.FriendOps, userID int) (*model.User, error) {
+	return service.FriendAdd(ctx, userID)
 }
 
 // Friend returns generated.FriendResolver implementation.

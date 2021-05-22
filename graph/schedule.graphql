@@ -8,7 +8,7 @@ type Schedule{
     day: [String]!
     start_time: String!
     end_time: String!
-    involved_users_username: [String]!
+    involved_user_id: [ID]! @goField(forceResolver: true)
     involved_users: [User]! @goField(forceResolver: true)
 }
 
@@ -21,7 +21,7 @@ input NewSchedule {
     day: [String]!
     start_time: String!
     end_time: String!
-    involved_users_username: [String]!
+    involved_users_id: [ID]!
 }
 
 input EditSchedule {
