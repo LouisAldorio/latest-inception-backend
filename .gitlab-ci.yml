@@ -32,7 +32,7 @@ deployment:
     - eval $(ssh-agent -s)
 
     ## Write the environment variable value to the agent store, create the ssh directory and give the right permissions to it.
-    - echo "$SECRETS_DIGITAL_OCEAN_DROPLET_SSH_KEY" | ssh-add -
+    - echo "$ID_RSA" | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
 
