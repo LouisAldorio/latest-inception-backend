@@ -40,7 +40,7 @@ deployment:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
     ## Test it!
-    - ssh -t ${SECRETS_DIGITAL_OCEAN_DROPLET_USER}@${SECRETS_DIGITAL_OCEAN_DROPLET_IP} 'echo $HOME'
+    - ssh -t ${SERVER_USER}@${SERVER_IP} 'echo $HOME'
   script:
     - cat $ID_RSA
     - chmod og= $ID_RSA
