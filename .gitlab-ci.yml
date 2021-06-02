@@ -11,11 +11,10 @@ variables:
 build: 
   image: docker:stable
   services:
-    - docker:dind
+    - docker:19.03.12-dind
   stage: build
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - sudo service docker start
     - docker build --build-arg VERSION=$CI_PIPELINE_ID -f Dockerfile -t $TAG_PIPELINE_ID -t $TAG_PIPELINE_ID .
     - docker push $TAG_LATEST
     - docker push $TAG_PIPELINE_ID
