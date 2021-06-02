@@ -30,6 +30,7 @@ deployment:
     - cat $ID_RSA
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
+    - apk add sshpass
     - sshpass -p $SSH_KEY ssh $SERVER_USER@$SERVER_IP "echo $HOME"
     # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
     # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
