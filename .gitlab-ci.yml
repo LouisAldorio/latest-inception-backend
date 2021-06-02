@@ -30,7 +30,7 @@ deployment:
     - mkdir -p ~/.ssh
     - cat $ID_RSA >> ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - which ssh-agent || ( apk update -y && apk add openssh-client git -y )
     - eval "$(ssh-agent -s)"
     - ssh-add ~/.ssh/id_rsa
     - ssh-keyscan -H 'gitlab.com' >> ~/.ssh/known_hosts
@@ -38,7 +38,7 @@ deployment:
     # - cat $ID_RSA
     # - chmod og= $ID_RSA
     # - apk update && apk add openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
