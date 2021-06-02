@@ -15,7 +15,7 @@ require (
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.1.0
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
-	gorm.io/driver/mysql v1.0.6 // indirect
+	gorm.io/driver/mysql v1.0.6
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/gorm v1.21.9
 )

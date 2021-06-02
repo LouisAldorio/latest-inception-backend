@@ -146,6 +146,7 @@ type ComplexityRoot struct {
 		ComoditiesByCategory     func(childComplexity int, categoryID int) int
 		ComoditiesWithCategories func(childComplexity int, limit *int, page *int) int
 		FriendList               func(childComplexity int) int
+		HelloWorld               func(childComplexity int) int
 		ScheduleByUser           func(childComplexity int) int
 		UserByUsername           func(childComplexity int, username string) int
 		UsersByRole              func(childComplexity int, role string) int
@@ -233,6 +234,7 @@ type QueryResolver interface {
 	ScheduleByUser(ctx context.Context) ([]*model.Schedule, error)
 	FriendList(ctx context.Context) ([]*model.Friend, error)
 	CategoryList(ctx context.Context) ([]*model.Category, error)
+	HelloWorld(ctx context.Context) (string, error)
 }
 type ScheduleResolver interface {
 	InvolvedUserID(ctx context.Context, obj *model.Schedule) ([]*int, error)
@@ -650,6 +652,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FriendList(childComplexity), true
+
+	case "Query.hello_world":
+		if e.complexity.Query.HelloWorld == nil {
+			break
+		}
+
+		return e.complexity.Query.HelloWorld(childComplexity), true
 
 	case "Query.schedule_by_user":
 		if e.complexity.Query.ScheduleByUser == nil {
@@ -1149,7 +1158,8 @@ type Query {
     users_by_role(role: String!): [User]!
     schedule_by_user: [Schedule]! 
     friend_list: [Friend]! 
-    category_list: [Category]!     
+    category_list: [Category]! 
+    hello_world: String!    
 }
 `, BuiltIn: false},
 	{Name: "graph/user.graphql", Input: `type User {
@@ -3409,6 +3419,41 @@ func (ec *executionContext) _Query_category_list(ctx context.Context, field grap
 	res := resTmp.([]*model.Category)
 	fc.Result = res
 	return ec.marshalNCategory2ᚕᚖmyappᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_hello_world(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().HelloWorld(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6882,6 +6927,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_category_list(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "hello_world":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_hello_world(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

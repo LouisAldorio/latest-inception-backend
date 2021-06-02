@@ -64,6 +64,10 @@ func (r *queryResolver) CategoryList(ctx context.Context) ([]*model.Category, er
 	return service.CategoryGetList(ctx)
 }
 
+func (r *queryResolver) HelloWorld(ctx context.Context) (string, error) {
+	return "Hello World",nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

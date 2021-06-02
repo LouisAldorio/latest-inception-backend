@@ -1,0 +1,42 @@
+stage:
+  - build
+  - deploy
+
+variables:
+  CONTAINER_NAME: inception-backend
+  TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  TAG_PIPELINE_ID: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_PIPELINE_ID
+  APP_DOMAIN: inception.louisaldorio.site
+
+build to image:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --build-arg VERSION=$CI_PIPELINE_ID -f Dockerfile -t $TAG_PIPELINE_ID -t $TAG_PIPELINE_ID .
+    - docker push $TAG_LATEST
+    - docker push $TAG_PIPELINE_ID
+  only:
+    - master
+
+
+deployment:
+  image: alpine:latest
+  stage: deploy
+  tags:
+    - deployment
+  script:
+    - chmod og= $ID_RSA
+    - apk update && apk add openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d --name $CONTAINER_NAME --env-file ./.env --net global-network $TAG_COMMIT"
+  environment:
+    name: production
+    url: https://$APP_DOMAIN
+  only:
+    - master

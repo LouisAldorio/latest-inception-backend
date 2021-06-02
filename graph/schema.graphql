@@ -15,5 +15,6 @@ type Query {
     users_by_role(role: String!): [User]!
     schedule_by_user: [Schedule]! 
     friend_list: [Friend]! 
-    category_list: [Category]!     
+    category_list: [Category]! 
+    hello_world: String!    
 }
