@@ -26,16 +26,11 @@ variables:
 deployment:
   image: alpine:latest
   stage: deploy
-  before_script:
-    - eval $(ssh-agent -s)
-    - cd ~
-    - touch id.rsa
-    - echo "$ID_RSA" > id.rsa
-    - chmod 700 id.rsa
   script:
+    - cat $ID_RSA
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
-    - ssh -i id.rsa -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
