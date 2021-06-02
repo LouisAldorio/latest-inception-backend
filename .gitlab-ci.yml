@@ -9,7 +9,7 @@ variables:
   APP_DOMAIN: inception.louisaldorio.site
   DOCKER_TLS_CERTDIR: ''
 
-build: 
+.build: 
   image: docker:stable-dind
   services:
     - docker:19.03.12-dind
