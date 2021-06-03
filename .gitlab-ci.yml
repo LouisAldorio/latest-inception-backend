@@ -31,7 +31,7 @@ deployment:
     - apk add sshpass
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "pwd"
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST"
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d --name $CONTAINER_NAME --env-file ./.env --net global-network $TAG_COMMIT"
