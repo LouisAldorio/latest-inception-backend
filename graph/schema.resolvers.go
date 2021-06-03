@@ -65,7 +65,7 @@ func (r *queryResolver) CategoryList(ctx context.Context) ([]*model.Category, er
 }
 
 func (r *queryResolver) HelloWorld(ctx context.Context) (string, error) {
-	return "Hello World this shows deployment is success though ssh!",nil
+	return "Last Attempt Succes!",nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
