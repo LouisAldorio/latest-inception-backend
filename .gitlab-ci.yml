@@ -28,8 +28,8 @@ deployment:
   stage: deploy
   script:
     - cat $ID_RSA
-    - cat $SERVER_USER
-    - cat $SERVER_IP
+    - echo $SERVER_USER
+    - echo $SERVER_IP
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
