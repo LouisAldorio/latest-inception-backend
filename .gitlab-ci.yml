@@ -33,7 +33,7 @@ deployment:
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST"
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
-    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d --name $CONTAINER_NAME --net global-network $TAG_LATEST"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d --name $CONTAINER_NAME --env-file ./.env --net global-network $TAG_LATEST"
   environment:
     name: production
     url: https://$APP_DOMAIN
