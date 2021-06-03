@@ -9,34 +9,33 @@ variables:
   APP_DOMAIN: inception.louisaldorio.site
   DOCKER_TLS_CERTDIR: ''
 
-# build: 
-#   image: docker:stable-dind
-#   services:
-#     - docker:19.03.12-dind
-#   stage: build
-#   script:
-#     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-#     - docker build --build-arg VERSION=$CI_PIPELINE_ID -f Dockerfile -t $TAG_PIPELINE_ID -t $TAG_LATEST .
-#     - docker push $TAG_LATEST
-#     - docker push $TAG_PIPELINE_ID
-#   only:
-#     - master
+build: 
+  image: docker:stable-dind
+  services:
+    - docker:19.03.12-dind
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --build-arg VERSION=$CI_PIPELINE_ID -f Dockerfile -t $TAG_PIPELINE_ID -t $TAG_LATEST .
+    - docker push $TAG_LATEST
+    - docker push $TAG_PIPELINE_ID
+  only:
+    - master
 
 
 deployment:
   image: alpine:latest
   stage: deploy
   script:
-    - cat $ID_RSA
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
     - apk add sshpass
     - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "pwd"
-    # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
-    # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
-    # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
-    # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d --name $CONTAINER_NAME --env-file ./.env --net global-network $TAG_COMMIT"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /home/louisaldorio/latest-$CONTAINER_NAME"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
+    - sshpass -p "$SSH_KEY" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d --name $CONTAINER_NAME --env-file ./.env --net global-network $TAG_COMMIT"
   environment:
     name: production
     url: https://$APP_DOMAIN
